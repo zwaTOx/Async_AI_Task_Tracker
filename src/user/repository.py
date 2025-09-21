@@ -8,7 +8,7 @@ class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def find_one_by_id(self, user_id: str):
+    async def get_by_id(self, user_id: str):
         stmt = select(User).filter(User.id == user_id)
         result = await self.session.exec(stmt)
         return result.first()
