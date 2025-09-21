@@ -8,3 +8,7 @@ class UserCreate(CustomBase):
     email: str
     password: str
     verify_password: str
+
+class UserLogin(CustomBase):
+    email: str
+    password: str

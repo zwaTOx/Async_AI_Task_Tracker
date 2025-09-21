@@ -8,6 +8,11 @@ class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    async def find_one_by_id(self, user_id: str):
+        stmt = select(User).filter(User.id == user_id)
+        result = await self.session.exec(stmt)
+        return result.first()
+
     async def get_user_by_email(self, user_email: str):
         statement = select(User).filter(User.email == user_email)
         result = await self.session.exec(statement)
@@ -20,3 +25,4 @@ class UserRepository:
         self.session.add(new_user)
         await self.session.commit()
         return new_user
+    

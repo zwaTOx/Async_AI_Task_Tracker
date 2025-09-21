@@ -11,3 +11,7 @@ class ConflictException(TaskTrackerHTTPException):
 class InvalidPasswordException(TaskTrackerHTTPException):
     def __init__(self, detail="Password mismatch error"):
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+
+class AuthException(TaskTrackerHTTPException):
+    def __init__(self, detail="Authentication failed"):
+        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
