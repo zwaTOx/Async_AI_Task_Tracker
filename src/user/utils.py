@@ -14,10 +14,11 @@ def verify_password(password, hashed_password) -> bool:
 def generate_auth_token(subject):
     """Generate a JWT token for the user."""
     now = datetime.now(timezone.utc)
-    exp = (now + timedelta(seconds=settings.USER_JWT_EXP_MIN*60)).timestamp()
+    exp = now + timedelta(minutes=settings.USER_JWT_EXP_MIN)
+    
     data = {
-        "exp": exp,
-        "sub": subject,
+        "exp": exp,  
+        "sub": str(subject), 
     }
     return jwt.encode(data, settings.JWT_SECRET_KEY, algorithm=settings.USER_JWT_ALG)
 
