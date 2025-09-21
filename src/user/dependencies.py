@@ -3,11 +3,14 @@ from fastapi import Depends, Request
 from jose import JWTError, jwt
 from src.exceptions import AuthException
 from src.config import settings
-from src.user.repository import User
+from src.database import DbSession
+from .repository import UserRepository
+from .models import User
 
-def get_current_user(
-    request: Request
-) -> str:
+async def get_current_user(
+    request: Request,
+    session: DbSession
+):
     token = request.cookies.get("access_token")
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.USER_JWT_ALG])
@@ -16,8 +19,8 @@ def get_current_user(
         raise AuthException(detail="Could not validate user")
     if not user_id:
         raise AuthException(detail="Invalid token payload")
-    user = User(request.state.db).get_by_id(
-        user_id=user_id
+    user = await UserRepository(session).get_by_id(
+        user_id=int(user_id)
     )
     if not user:
         raise AuthException(detail="User not found")
