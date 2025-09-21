@@ -9,8 +9,8 @@ class UserRepository:
         self.session = session
 
     async def get_by_id(self, user_id: str):
-        stmt = select(User).filter(User.id == user_id)
-        result = await self.session.exec(stmt)
+        statement = select(User).filter(User.id == user_id)
+        result = await self.session.exec(statement)
         return result.first()
 
     async def get_user_by_email(self, user_email: str):

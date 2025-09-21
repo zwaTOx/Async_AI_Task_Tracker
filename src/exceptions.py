@@ -15,3 +15,7 @@ class InvalidPasswordException(TaskTrackerHTTPException):
 class AuthException(TaskTrackerHTTPException):
     def __init__(self, detail="Authentication failed"):
         super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
+
+class PermissionException(TaskTrackerHTTPException):
+    def __init__(self, detail="Доступ запрещен"):
+        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
