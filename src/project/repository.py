@@ -34,3 +34,7 @@ class ProjectRepository:
             setattr(project, key, value)
         await self.session.commit()
         return project
+    
+    async def delete_project(self, project):
+        await self.session.delete(project)
+        await self.session.commit()

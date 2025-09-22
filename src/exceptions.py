@@ -19,3 +19,7 @@ class AuthException(TaskTrackerHTTPException):
 class PermissionException(TaskTrackerHTTPException):
     def __init__(self, detail="Доступ запрещен"):
         super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
+
+class NotFoundException(TaskTrackerHTTPException):
+    def __init__(self, detail="Не найдено"):
+        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=detail)

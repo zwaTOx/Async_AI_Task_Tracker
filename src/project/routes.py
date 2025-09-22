@@ -48,3 +48,14 @@ async def update_project(
         user.id, project_id, project_update_data
     )
     return updated_project
+
+@project_router.delete(
+    "/{project_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_project(
+    session: DbSession,
+    user: CurrentUser,
+    project_id: int
+):
+    await ProjectService(session).delete_project(user.id, project_id)
