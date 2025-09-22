@@ -11,7 +11,11 @@ async def get_current_user(
     request: Request,
     session: DbSession
 ):
-    token = request.cookies.get("access_token")
+    authorization: str = request.headers.get("Authorization")
+    if not authorization: 
+        token = request.cookies.get("access_token")
+        if not token:
+            raise AuthException(detail="Token required")
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.USER_JWT_ALG])
         user_id = payload.get('sub')
