@@ -30,7 +30,7 @@ async def auth_user(
     token = await UserService(session).auth_user(user_login_data)
     response.set_cookie(
         key='access_token',
-        value=token, 
+        value=f"Bearer {token}", 
         httponly=True,
         samesite='none',
         secure=True
