@@ -12,6 +12,10 @@ class InvalidPasswordException(TaskTrackerHTTPException):
     def __init__(self, detail="Password mismatch error"):
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
 
+class BadRequestException(TaskTrackerHTTPException):
+    def __init__(self, detail):
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+
 class AuthException(TaskTrackerHTTPException):
     def __init__(self, detail="Authentication failed"):
         super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
@@ -23,3 +27,7 @@ class PermissionException(TaskTrackerHTTPException):
 class NotFoundException(TaskTrackerHTTPException):
     def __init__(self, detail="Не найдено"):
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=detail)
+
+class IternalServerException(TaskTrackerHTTPException):
+    def __init__(self, detail="Ошибка отправки"):
+        super().__init__(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)

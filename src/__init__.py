@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from src.database import init_db
 from src.user.routes import user_router
 from src.project.routes import project_router
+from src.user_project_association.routes import user_project_as_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,4 +35,8 @@ app.include_router(
 )
 app.include_router(
     project_router, prefix='/api/projects', tags=['Project']
+)
+
+app.include_router(
+    user_project_as_router, prefix='/api/projects', tags=['User in Project']
 )

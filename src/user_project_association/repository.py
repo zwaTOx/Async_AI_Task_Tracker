@@ -7,6 +7,11 @@ class UserProjectAssociationRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    async def get_project_memberships(self, project_id: int):
+        statement = select(UserProjectAssociation).filter(UserProjectAssociation.project_id==project_id)
+        result = await self.session.exec(statement)
+        return result.all()
+
     async def get_membership(self, user_id: int, project_id: int):
         statement = select(UserProjectAssociation).filter(UserProjectAssociation.user_id == user_id, UserProjectAssociation.project_id==project_id)
         result = await self.session.exec(statement)
