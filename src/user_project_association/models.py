@@ -16,6 +16,6 @@ class UserProjectAssociation(Base):
     joined_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.current_timestamp())
     invited_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
 
