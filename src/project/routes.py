@@ -30,7 +30,7 @@ async def create_project(
     user: CurrentUser,
     project_create_data: ProjectCreate
 ):
-    new_project = await ProjectRepository(session).create_project(
+    new_project = await ProjectService(session).create_project(
         user.id, project_create_data
     )
     return new_project

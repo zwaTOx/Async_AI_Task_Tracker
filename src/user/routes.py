@@ -32,8 +32,9 @@ async def auth_user(
         key='access_token',
         value=token, 
         httponly=True,
+        samesite='none',
         secure=True
     )
     return {
-        "message": "HttpOnly cookie set successfully"
+        "access_token": token
     }
