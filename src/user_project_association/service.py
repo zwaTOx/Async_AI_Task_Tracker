@@ -43,11 +43,11 @@ class ProjectAssociationService:
         founded_user = await UserRepository(self.session).get_user_by_email(inv_email)
         if founded_user is None:
             raise NotFoundException
-        
+
         inviter_membership = await UserProjectAssociationRepository(self.session).\
             get_membership(founded_user.id, project_id)
         if inviter_membership is not None:
-            raise BadRequestException("The user is already a member of the project")
+            raise BadRequestException("Пользователь уже является частью проекта")
         invite_token = create_invite_project_token(project_id, founded_user.id, inv_role)
         url = f"{settings.BASE_URL}/users/invite?access_token={invite_token}"
         result = send_project_invite(founded_user.email, "Noname", "Noname", url)
@@ -58,6 +58,10 @@ class ProjectAssociationService:
         invite_token: str
     ):
         project_data = decode_invite_project_token(invite_token)
+        membership = await UserProjectAssociationRepository(self.session).\
+            get_membership(project_data.user_id, project_data.project_id)
+        if membership is not None:
+            BadRequestException("Пользователь уже является частью проекта")
         await UserProjectAssociationRepository(self.session).register_invited_user(project_data)
         return project_data
     
