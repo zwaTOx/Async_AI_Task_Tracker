@@ -27,7 +27,7 @@ async def auth_user(
     user_login_data: UserLogin,
     response: Response
 ):
-    token = await UserService(session).auth_user(user_login_data)
+    token, user_id = await UserService(session).auth_user(user_login_data)
     response.set_cookie(
         key='access_token',
         value=token, 
@@ -36,5 +36,6 @@ async def auth_user(
         secure=True
     )
     return {
-        "access_token": token
+        "access_token": token,
+        "user_id": user_id
     }

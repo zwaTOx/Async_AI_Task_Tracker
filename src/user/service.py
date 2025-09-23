@@ -29,4 +29,4 @@ class UserService:
             raise AuthException
         if not verify_password(user_auth_data.password, founded_user.hashed_password):
             raise AuthException
-        return generate_auth_token(founded_user.id)
+        return generate_auth_token(founded_user.id), founded_user.id
