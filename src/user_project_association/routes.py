@@ -36,10 +36,13 @@ async def invite_user(
     await ProjectAssociationService(session).invite_member_by_email(
         request, user, project_id, inv_email, inv_role
     )
-    return 2
+    return {
+        "message": "Приглашение в проект успешно отправлено"
+    }
 
 @user_project_as_router.post(
-    "/members/confirm"
+    "/members/confirm",
+    status_code=status.HTTP_201_CREATED 
 )
 async def confirm_invite(
     session: DbSession,
