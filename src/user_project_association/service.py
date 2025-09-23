@@ -2,7 +2,7 @@ from fastapi import Request
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.exceptions import PermissionException, NotFoundException, BadRequestException, IternalServerException
 from src.user.repository import UserRepository
-from src.code.utils import create_invite_project_token
+from src.code.utils import create_invite_project_token, decode_invite_project_token
 from src.email.invite import send_project_invite
 from .schemes import InviteModel
 from .repository import UserProjectAssociationRepository
@@ -25,12 +25,14 @@ class ProjectAssociationService:
         request: Request, 
         user, 
         project_id: int, 
-        invitation_request: InviteModel):
+        inv_email: str,
+        inv_role: str
+        ):
         membership = await UserProjectAssociationRepository(self.session).get_membership(user.id, project_id)
         if membership is None:
             raise PermissionException
         
-        founded_user = await UserRepository(self.session).get_user_by_email(invitation_request.email)
+        founded_user = await UserRepository(self.session).get_user_by_email(inv_email)
         if founded_user is None:
             raise NotFoundException
         
@@ -38,10 +40,15 @@ class ProjectAssociationService:
             get_membership(founded_user.id, project_id)
         if inviter_membership is not None:
             raise BadRequestException("The user is already a member of the project")
-        invite_token = create_invite_project_token(founded_user.id, project_id)
+        invite_token = create_invite_project_token(project_id, founded_user.id, inv_role)
         url = f"{request.base_url}/users/invite?access_token={invite_token}"
         result = send_project_invite(founded_user.email, "Noname", "Noname", url)
         if not result:
             raise IternalServerException
         
-        
+    async def confirm_invite(self, 
+        invite_token: str
+    ):
+        project_data = decode_invite_project_token(invite_token)
+        await UserProjectAssociationRepository(self.session).register_invited_user(project_data)
+        return project_data

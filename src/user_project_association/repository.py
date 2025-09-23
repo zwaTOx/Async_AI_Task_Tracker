@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from .models import UserProjectAssociation
+from .schemes import InviteProjectData
 from .utils import Role
 
 class UserProjectAssociationRepository:
@@ -29,6 +30,16 @@ class UserProjectAssociationRepository:
         print(f"Association created: {new_assoc.id}")
         return new_assoc
     
+    async def register_invited_user(self, project_data: InviteProjectData
+    ):
+        new_assoc = UserProjectAssociation(
+            **project_data.model_dump()
+        )
+        self.session.add(new_assoc)
+        await self.session.commit()
+        print(f"Association created: {new_assoc.id}")
+        return new_assoc
+
     async def delete_member(self, member_id: int, project_id):
         membership = await self.get_membership(member_id, project_id)
         await self.session.delete(membership)

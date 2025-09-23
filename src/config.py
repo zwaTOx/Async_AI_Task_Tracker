@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     INVITE_CODE_SECRET_KEY: str
     INVITE_CODE_SECRET_ALG: str
 
+    DEFAULT_PROJECT_ROLE: str
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"

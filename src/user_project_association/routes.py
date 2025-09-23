@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Query, Request, status
 
+from src.config import settings
 from src.database import DbSession
 from src.user.dependencies import CurrentUser
 from .service import ProjectAssociationService
@@ -21,16 +22,28 @@ async def get_project_members(
     return members
 
 @user_project_as_router.post(
-    "{project_id}/members"
+    "{project_id}/members/invite",
+    status_code=status.HTTP_201_CREATED 
 )
 async def invite_user(
     session: DbSession,
     user: CurrentUser,
     request: Request,
     project_id: int,
-    invitation_request: InviteModel
+    inv_email: str = Query(...),
+    inv_role: str = Query(default=settings.DEFAULT_PROJECT_ROLE)
 ):
     await ProjectAssociationService(session).invite_member_by_email(
-        request, user, project_id, invitation_request
+        request, user, project_id, inv_email, inv_role
     )
     return 2
+
+@user_project_as_router.post(
+    "/members/confirm"
+)
+async def confirm_invite(
+    session: DbSession,
+    invite_token: str
+):
+    project_data = await ProjectAssociationService(session).confirm_invite(invite_token)
+    return project_data
