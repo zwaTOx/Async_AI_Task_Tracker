@@ -53,3 +53,15 @@ class ProjectAssociationService:
         project_data = decode_invite_project_token(invite_token)
         await UserProjectAssociationRepository(self.session).register_invited_user(project_data)
         return project_data
+    
+    async def delete_project_member(self,
+            user_id: int, project_id: int, del_user_id: int):
+        del_user = await UserRepository(self.session).get_by_id(del_user_id)
+        if del_user is None:
+            raise NotFoundException
+        inviter_membership = await UserProjectAssociationRepository(self.session).\
+            get_membership(del_user.id, project_id)
+        if inviter_membership is None:
+            raise BadRequestException("Пользователь не является частью проекта")
+        await UserProjectAssociationRepository(self.session).delete_member(del_user_id, project_id)
+        

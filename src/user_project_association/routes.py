@@ -49,3 +49,19 @@ async def confirm_invite(
 ):
     project_data = await ProjectAssociationService(session).confirm_invite(invite_token)
     return project_data
+
+@user_project_as_router.delete(
+    "{project_id}/members/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_project_member(
+    session: DbSession,
+    user: CurrentUser,
+    project_id: int,
+    user_id: int
+):
+    await ProjectAssociationService(session).delete_project_member(
+        user.id,
+        project_id,
+        user_id
+    )
