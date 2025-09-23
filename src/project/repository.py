@@ -1,6 +1,7 @@
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.exceptions import PermissionException
+from src.user_project_association.models import UserProjectAssociation
 
 from .schemes import ProjectCreate, ProjectUpdate
 from .models import Project
@@ -21,7 +22,9 @@ class ProjectRepository:
         return new_project
     
     async def get_projects(self, user_id: int) -> list[Project]:
-        statement = select(Project).filter(Project.owner_id == user_id)
+        statement = select(Project)\
+        .join(UserProjectAssociation, Project.id == UserProjectAssociation.project_id)\
+        .where(UserProjectAssociation.user_id == user_id)
         result = await self.session.exec(statement)
         return result.all()
     
