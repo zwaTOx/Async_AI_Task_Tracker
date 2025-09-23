@@ -60,10 +60,11 @@ class ProjectAssociationService:
         project_data = decode_invite_project_token(invite_token)
         membership = await UserProjectAssociationRepository(self.session).\
             get_membership(project_data.user_id, project_data.project_id)
+        print(membership)
         if membership is not None:
-            BadRequestException("Пользователь уже является частью проекта")
-        await UserProjectAssociationRepository(self.session).register_invited_user(project_data)
-        return project_data
+            raise BadRequestException("Пользователь уже является частью проекта")
+        new_assos = await UserProjectAssociationRepository(self.session).register_invited_user(project_data)
+        return new_assos
     
     async def delete_project_member(self,
             user_id: int, project_id: int, del_user_id: int):
