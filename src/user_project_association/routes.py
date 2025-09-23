@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Query, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 
 from src.config import settings
 from src.database import DbSession
 from src.user.dependencies import CurrentUser
 from .service import ProjectAssociationService
 from .schemes import InviteModel
+from .dependencies import verify_project_admin
 
 user_project_as_router = APIRouter()
 
@@ -52,7 +53,8 @@ async def confirm_invite(
 
 @user_project_as_router.delete(
     "{project_id}/members/{user_id}",
-    status_code=status.HTTP_204_NO_CONTENT
+    dependencies=[Depends(verify_project_admin)],
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_project_member(
     session: DbSession,
