@@ -30,11 +30,10 @@ async def invite_user(
     user: CurrentUser,
     request: Request,
     project_id: int,
-    inv_email: str = Query(...),
-    inv_role: str = Query(default=settings.DEFAULT_PROJECT_ROLE)
+    inv_data: InviteModel = Query(...)
 ):
     await ProjectAssociationService(session).invite_member_by_email(
-        request, user, project_id, inv_email, inv_role
+        request, user, project_id, inv_data.email, inv_data.role
     )
     return {
         "message": "Приглашение в проект успешно отправлено"

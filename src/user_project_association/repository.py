@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from .models import UserProjectAssociation
 from .schemes import InviteProjectData
-from .utils import Role
+from .utils import Roles
 
 class UserProjectAssociationRepository:
     def __init__(self, session: AsyncSession):

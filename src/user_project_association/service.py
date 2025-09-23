@@ -6,6 +6,7 @@ from src.code.utils import create_invite_project_token, decode_invite_project_to
 from src.email.invite import send_project_invite
 from .schemes import InviteModel
 from .repository import UserProjectAssociationRepository
+from src.config import settings
 
 class ProjectAssociationService:
     def __init__(self, session: AsyncSession):
@@ -41,7 +42,7 @@ class ProjectAssociationService:
         if inviter_membership is not None:
             raise BadRequestException("The user is already a member of the project")
         invite_token = create_invite_project_token(project_id, founded_user.id, inv_role)
-        url = f"{request.base_url}/users/invite?access_token={invite_token}"
+        url = f"{settings.BASE_URL}/users/invite?access_token={invite_token}"
         result = send_project_invite(founded_user.email, "Noname", "Noname", url)
         if not result:
             raise IternalServerException

@@ -1,6 +1,7 @@
 from pydantic_settings import  BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
+    BASE_URL: str = "http://127.0.0.1:8001"
     DATABASE_URL: str
 
     USER_JWT_EXP_MIN: int
