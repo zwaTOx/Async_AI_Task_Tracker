@@ -71,11 +71,13 @@ class ProjectAssociationService:
         del_user = await UserRepository(self.session).get_by_id(del_user_id)
         if del_user is None:
             raise NotFoundException
-        inviter_membership = await UserProjectAssociationRepository(self.session).\
+        del_membership = await UserProjectAssociationRepository(self.session).\
             get_membership(del_user.id, project_id)
-        if inviter_membership is None:
+        if del_membership is None:
             raise BadRequestException("Пользователь не является частью проекта")
-        if inviter_membership.role == "OWNER":
+        if del_membership.user_id == user_id:
+            raise BadRequestException("Вы не можете кикнуть себя из проекта")
+        if del_membership.role == "OWNER":
             raise PermissionException("Недостаточно прав для совершения этого действия")
         await UserProjectAssociationRepository(self.session).delete_member(del_user_id, project_id)
         
