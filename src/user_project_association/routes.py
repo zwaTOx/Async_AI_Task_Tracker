@@ -5,12 +5,13 @@ from src.database import DbSession
 from src.user.dependencies import CurrentUser
 from .service import ProjectAssociationService
 from .schemes import InviteModel
-from .dependencies import verify_project_admin
+from .dependencies import verify_project_admin, vefify_project_member
 
 user_project_as_router = APIRouter()
 
 @user_project_as_router.get(
-    "{project_id}/members"
+    "{project_id}/members",
+    dependencies=[Depends(vefify_project_member)]
 )
 async def get_project_members(
     session: DbSession,
@@ -24,6 +25,7 @@ async def get_project_members(
 
 @user_project_as_router.post(
     "{project_id}/members/invite",
+    dependencies=[Depends(verify_project_admin)],
     status_code=status.HTTP_201_CREATED 
 )
 async def invite_user(
@@ -34,7 +36,7 @@ async def invite_user(
     inv_data: InviteModel = Query(...)
 ):
     await ProjectAssociationService(session).invite_member_by_email(
-        request, user, project_id, inv_data.email, inv_data.role
+        user, project_id, inv_data.email, inv_data.role
     )
     return {
         "message": "Приглашение в проект успешно отправлено"
@@ -67,3 +69,15 @@ async def delete_project_member(
         project_id,
         user_id
     )
+
+@user_project_as_router.delete(
+    "{project_id}/leave",
+    dependencies=[Depends(vefify_project_member)],
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def leave_project(
+    session: DbSession,
+    user: CurrentUser,
+    project_id: int
+):
+    await ProjectAssociationService(session).leave_project(user.id, project_id)

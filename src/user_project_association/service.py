@@ -23,14 +23,19 @@ class ProjectAssociationService:
         user_id: int, 
         project_id: int
     ):
-        membership = await UserProjectAssociationRepository(self.session).get_membership(user_id, project_id)
-        if membership is None:
-            raise PermissionException
         memberships = await UserProjectAssociationRepository(self.session).get_project_memberships(project_id)
         return memberships
     
+    async def get_project_member(self,
+        user_id: int,
+        project_id: int
+    ):
+        membership = await UserProjectAssociationRepository(self.session).get_membership(user_id, project_id)
+        if membership is None:
+            raise PermissionException
+        return membership
+
     async def invite_member_by_email(self, 
-        request: Request, 
         user, 
         project_id: int, 
         inv_email: str,
@@ -60,7 +65,6 @@ class ProjectAssociationService:
         project_data = decode_invite_project_token(invite_token)
         membership = await UserProjectAssociationRepository(self.session).\
             get_membership(project_data.user_id, project_data.project_id)
-        print(membership)
         if membership is not None:
             raise BadRequestException("Пользователь уже является частью проекта")
         new_assos = await UserProjectAssociationRepository(self.session).register_invited_user(project_data)
@@ -80,4 +84,13 @@ class ProjectAssociationService:
         if del_membership.role == "OWNER":
             raise PermissionException("Недостаточно прав для совершения этого действия")
         await UserProjectAssociationRepository(self.session).delete_member(del_user_id, project_id)
+        
+    async def leave_project(self,
+        user_id: int, project_id: int
+    ):
+        membership = await self.get_project_member(user_id, project_id)
+        if membership.role == "OWNER":
+            raise BadRequestException("Создатель проекта не может выйти из проекта")
+        await UserProjectAssociationRepository(self.session).delete_member(user_id, project_id)
+        
         

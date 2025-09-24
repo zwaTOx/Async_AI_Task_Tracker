@@ -14,3 +14,11 @@ async def verify_project_admin(
         project_id=project_id
     ):
         raise PermissionException("Недостаточно прав для выполнения данного действия")
+    
+async def vefify_project_member(
+    session: DbSession,
+    current_user: CurrentUser,
+    project_id: int
+):
+    """Зависимость для проверки членства в проекте."""
+    await ProjectAssociationService(session).get_project_member(current_user.id, project_id)
