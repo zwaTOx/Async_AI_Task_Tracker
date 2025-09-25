@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from .models import UserProjectAssociation
-from .schemes import InviteProjectData
+from .schemes import InviteProjectData, UpdateMemberData, MembershipResponse
 from .utils import Roles
 
 class UserProjectAssociationRepository:
@@ -13,7 +13,7 @@ class UserProjectAssociationRepository:
         result = await self.session.exec(statement)
         return result.all()
 
-    async def get_membership(self, user_id: int, project_id: int):
+    async def get_membership(self, user_id: int, project_id: int) -> MembershipResponse:
         statement = select(UserProjectAssociation).filter(UserProjectAssociation.user_id == user_id, UserProjectAssociation.project_id==project_id)
         result = await self.session.exec(statement)
         return result.first()
@@ -40,7 +40,17 @@ class UserProjectAssociationRepository:
         print(f"Association created: {new_assoc.id}")
         return new_assoc
 
-    async def delete_member(self, member_id: int, project_id):
+    async def update_member(self,
+        member_id: int, project_id: int, member_data: UpdateMemberData
+        ) -> MembershipResponse:
+        membership = await self.get_membership(member_id, project_id)
+        update_data = member_data.model_dump(exclude_none=True)
+        for key, value in update_data.items():
+            setattr(membership, key, value)
+        await self.session.commit()
+        return membership
+    
+    async def delete_member(self, member_id: int, project_id: int):
         membership = await self.get_membership(member_id, project_id)
         await self.session.delete(membership)
         await self.session.commit()

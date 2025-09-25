@@ -4,7 +4,7 @@ from src.exceptions import PermissionException, NotFoundException, BadRequestExc
 from src.user.repository import UserRepository
 from src.code.utils import create_invite_project_token, decode_invite_project_token
 from src.email.invite import send_project_invite
-from .schemes import InviteModel
+from .schemes import InviteModel, UpdateMemberData, MembershipResponse
 from .repository import UserProjectAssociationRepository
 from src.config import settings
 
@@ -70,6 +70,21 @@ class ProjectAssociationService:
         new_assos = await UserProjectAssociationRepository(self.session).register_invited_user(project_data)
         return new_assos
     
+    async def update_project_member(self,
+        user_id: int, project_id: int, member_id: int, update_data: UpdateMemberData) -> MembershipResponse:
+        membership = await UserProjectAssociationRepository(self.session).\
+            get_membership(member_id, project_id)
+        if membership is None:
+            raise BadRequestException("Пользователь не является частью проекта")
+        if membership.user_id == user_id:
+            raise BadRequestException("Вы не можете обновить свои роли в проекте #ВРЕМЕННО")
+        if membership.role == "OWNER":
+            raise PermissionException("Недостаточно прав для совершения этого действия")
+        upd_membership = await UserProjectAssociationRepository(self.session).\
+            update_member(member_id, project_id, update_data)
+        return upd_membership
+        
+
     async def delete_project_member(self,
             user_id: int, project_id: int, del_user_id: int):
         del_user = await UserRepository(self.session).get_by_id(del_user_id)

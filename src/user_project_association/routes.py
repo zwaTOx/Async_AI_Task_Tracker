@@ -4,7 +4,7 @@ from src.config import settings
 from src.database import DbSession
 from src.user.dependencies import CurrentUser
 from .service import ProjectAssociationService
-from .schemes import InviteModel
+from .schemes import InviteModel, UpdateMemberData
 from .dependencies import verify_project_admin, vefify_project_member
 
 user_project_as_router = APIRouter()
@@ -52,6 +52,25 @@ async def confirm_invite(
 ):
     project_data = await ProjectAssociationService(session).confirm_invite(invite_token)
     return project_data
+
+@user_project_as_router.put(
+    "/{project_id}/members/{member_id}",
+    dependencies=[Depends(verify_project_admin)]
+)
+async def update_member_role(
+    session: DbSession,
+    user: CurrentUser,
+    project_id: int,
+    member_id: int,
+    update_data: UpdateMemberData
+):
+    upd_membership = await ProjectAssociationService(session).update_project_member(
+        user.id,
+        project_id,
+        member_id,
+        update_data
+    )
+    return upd_membership
 
 @user_project_as_router.delete(
     "{project_id}/members/{user_id}",

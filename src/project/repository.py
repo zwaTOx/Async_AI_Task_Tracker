@@ -1,4 +1,4 @@
-from sqlmodel import select
+from sqlmodel import delete, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.exceptions import PermissionException
 from src.user_project_association.models import UserProjectAssociation
@@ -10,8 +10,8 @@ class ProjectRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_project(self, user_id: int, project_id: int) -> Project:
-        statement = select(Project).filter(Project.owner_id == user_id, Project.id == project_id)
+    async def get_project(self, project_id: int) -> Project:
+        statement = select(Project).filter(Project.id == project_id)
         result = await self.session.exec(statement)
         return result.first()
 
@@ -29,7 +29,7 @@ class ProjectRepository:
         return result.all()
     
     async def update_project(self, user_id: int, project_id: int, project_data: ProjectUpdate):
-        project = await self.get_project(user_id, project_id)
+        project = await self.get_project(project_id)
         if project is None:
             raise PermissionException
         update_data = project_data.model_dump(exclude_none=True)
@@ -38,6 +38,7 @@ class ProjectRepository:
         await self.session.commit()
         return project
     
-    async def delete_project(self, project):
-        await self.session.delete(project)
+    async def delete_project(self, project_id: int):
+        statement = delete(Project).where(Project.id == project_id)
+        await self.session.exec(statement)
         await self.session.commit()
