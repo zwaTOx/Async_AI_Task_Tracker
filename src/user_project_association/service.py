@@ -47,7 +47,7 @@ class ProjectAssociationService:
         
         founded_user = await UserRepository(self.session).get_user_by_email(inv_email)
         if founded_user is None:
-            raise NotFoundException
+            raise NotFoundException("Данный пользователь не зарегистрирован в приложении")
 
         inviter_membership = await UserProjectAssociationRepository(self.session).\
             get_membership(founded_user.id, project_id)
