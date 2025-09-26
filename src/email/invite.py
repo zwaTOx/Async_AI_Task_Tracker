@@ -3,20 +3,10 @@ from random import randint
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from src.config import settings
-from fastapi import HTTPException
+from .utils import get_stmp
 
 SENDER_EMAIL = settings.SENDER_EMAIL
 SENDER_EMAIL_PASSWORD = settings.SENDER_EMAIL_PASSWORD
-
-def get_stmp(email):
-    pattern = 'smtp.'
-    domain_name = email.split('@')[1]   
-    return pattern+domain_name, 587
-
-def generate_code() -> str:
-    code = str(randint(0, 999999))
-    return code
-
 
 def send_project_invite(
     recipient_email: str,

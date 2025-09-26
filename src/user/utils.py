@@ -1,10 +1,9 @@
-
-#Обязательно сделать хеширование в проде
 from datetime import datetime, timedelta, timezone
 from src.config import settings
 from jose import jwt
 
 def hash_password(password: str) -> str:
+    #Обязательно сделать хеширование в проде
     hashed_password = password
     return hashed_password
 
@@ -21,5 +20,3 @@ def generate_auth_token(subject):
         "sub": str(subject), 
     }
     return jwt.encode(data, settings.JWT_SECRET_KEY, algorithm=settings.USER_JWT_ALG)
-
-

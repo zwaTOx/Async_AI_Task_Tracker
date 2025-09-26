@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from random import randint
 from jose import JWTError, jwt
 from src.config import settings
 from src.exceptions import AuthException
@@ -28,3 +29,7 @@ def decode_invite_project_token(invite_token: str) -> InviteProjectData:
                 raise AuthException("Токен приглашения истек")
             else:
                 raise AuthException("Недопустимый токен приглашения")
+            
+def generate_code() -> str:
+    code = f'{randint(0, 999999):06}'
+    return code

@@ -1,6 +1,8 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
-from src.exceptions import ConflictException, InvalidPasswordException, AuthException
+from src.exceptions import ConflictException, InvalidPasswordException, AuthException, BadRequestException
 from .schemes import UserCreate, UserResponse, UserLogin
+from src.email.password import send_recovery_code
+from src.code.repository import CodeRepository
 from .repository import UserRepository
 from .utils import verify_password, generate_auth_token
 
@@ -30,3 +32,11 @@ class UserService:
         if not verify_password(user_auth_data.password, founded_user.hashed_password):
             raise AuthException
         return generate_auth_token(founded_user.id), founded_user.id
+    
+    async def reset_password(self, email: str):
+        founded_user = await UserRepository(self.session).get_user_by_email(email)
+        if founded_user is None:
+            raise BadRequestException("Пользователя с таким email не существует")
+        code = send_recovery_code(email)
+        await CodeRepository(self.session).create_restore_code(founded_user.id, code)
+        

@@ -39,3 +39,13 @@ async def auth_user(
         "access_token": token,
         "user_id": user_id
     }
+
+@user_router.post(
+    "/forgot-password",
+    status_code=status.HTTP_201_CREATED
+)
+async def send_reset_code(
+    session: DbSession,
+    email: str
+):
+    await UserService(session).reset_password(email)
