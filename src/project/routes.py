@@ -1,10 +1,11 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
 from src.database import DbSession
 from src.user.dependencies import CurrentUser
 from .schemes import ProjectCreate, ProjectResponse, ProjectPagination, ProjectUpdate
 from .repository import ProjectRepository
 from .service import ProjectService
+from src.user_project_association.dependencies import verify_project_admin
 
 project_router = APIRouter()
 
@@ -36,7 +37,8 @@ async def create_project(
     return new_project
 
 @project_router.patch(
-    "/{project_id}"
+    "/{project_id}",
+    dependencies=[Depends(verify_project_admin)]
 )
 async def update_project(
     session: DbSession,

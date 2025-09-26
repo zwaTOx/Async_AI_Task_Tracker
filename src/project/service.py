@@ -24,5 +24,6 @@ class ProjectService:
         project = await ProjectRepository(self.session).get_project(project_id)
         if not project:
             raise NotFoundException("Проект не найден")
-        # await UserProjectAssociationRepository(self.session).delete_member(user_id, project_id)
+        if project.owner_id != user_id:
+            raise PermissionError
         await ProjectRepository(self.session).delete_project(project_id)
