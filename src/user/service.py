@@ -36,6 +36,9 @@ class UserService:
         if password_update_data.password != password_update_data.verify_password:
             raise BadRequestException("Пароли не совпадают")
         user_id = decode_reset_password_token(token)
+        user = await UserRepository(self.session).get_by_id(user_id)
+        if verify_password(password_update_data.password, user.hashed_password):
+            raise BadRequestException("Нельзя изменить пароль на старный пароль")
         await UserRepository(self.session).update_password(user_id, password_update_data)
         
         
