@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response, status
 
 from src.database import DbSession
-from .schemes import UserLogin, UserResponse, UserCreate
+from .schemes import UserLogin, UserResponse, UserCreate, ResetPasswordData
 from .service import UserService
 
 user_router = APIRouter()
@@ -40,12 +40,15 @@ async def auth_user(
         "user_id": user_id
     }
 
-@user_router.post(
-    "/forgot-password",
-    status_code=status.HTTP_201_CREATED
+@user_router.put(
+    "/reset-password",
 )
-async def send_reset_code(
+async def reset_password(
     session: DbSession,
-    email: str
+    token: str,
+    password_update_data: ResetPasswordData
 ):
-    await UserService(session).reset_password(email)
+    await UserService(session).reset_password(token, password_update_data)
+    return {
+        "message": "Пароль успешно обновлен"
+    }

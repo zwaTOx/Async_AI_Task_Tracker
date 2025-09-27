@@ -12,3 +12,7 @@ class UserCreate(CustomBase):
 class UserLogin(CustomBase):
     email: str
     password: str
+
+class ResetPasswordData(CustomBase):
+    password: str
+    verify_password: str

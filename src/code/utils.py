@@ -48,7 +48,7 @@ def decode_reset_password_token(token: str) -> int:
             exp_datetime = datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
             if current_time > exp_datetime:
                 raise AuthException("Токен смены пароля истек")
-        return payload
+        return payload['user_id']
     except JWTError as e:
         if isinstance(e, jwt.ExpiredSignatureError):
             raise AuthException("Токен восстановления пароля истек")

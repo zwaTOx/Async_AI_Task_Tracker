@@ -1,7 +1,7 @@
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from .models import User
-from .schemes import UserCreate
+from .schemes import UserCreate, ResetPasswordData
 from .utils import hash_password
 
 class UserRepository:
@@ -26,3 +26,9 @@ class UserRepository:
         await self.session.commit()
         return new_user
     
+    async def update_password(self, user_id, password_data: ResetPasswordData):
+        new_hashed_password = hash_password(password_data.password) 
+        user = await self.get_by_id(user_id)
+        user.hashed_password = new_hashed_password
+        self.session.add(user)
+        await self.session.commit()
