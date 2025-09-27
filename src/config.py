@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     INVITE_CODE_SECRET_KEY: str
     INVITE_CODE_SECRET_ALG: str
 
+    RESET_CODE_EXCPIRES_MINUTES: int
+    RESET_CODE_SECRET_KEY: str
+    RESET_CODE_SECRET_ALG: str
+
     DEFAULT_PROJECT_ROLE: str = 'USER'
 
     model_config = SettingsConfigDict(
