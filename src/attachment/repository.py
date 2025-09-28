@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlmodel import select
 
 from .model import Attachment
 
@@ -15,3 +16,8 @@ class AttachmentRepository:
         self.session.add(attach)
         await self.session.commit()
         return attach
+    
+    async def get_attachment_by_id(self, attach_id: int):
+        statement = select(Attachment).filter(Attachment.id==attach_id)
+        result = await self.session.exec(statement)
+        return result.first()

@@ -1,5 +1,6 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
-from src.exceptions import ConflictException, InvalidPasswordException, AuthException, BadRequestException
+from src.attachment.repository import AttachmentRepository
+from src.exceptions import ConflictException, InvalidPasswordException, AuthException, BadRequestException, NotFoundException
 from src.code.utils import decode_reset_password_token
 from .schemes import UserCreate, UserResponse, UserLogin, ResetPasswordData, UserUpdateData
 from .repository import UserRepository
@@ -33,6 +34,10 @@ class UserService:
         return generate_auth_token(founded_user.id), founded_user.id
     
     async def update_user(self, user_id: int, user_update_data: UserUpdateData):
+        if user_update_data.icon_id is not None:
+            attach = await AttachmentRepository(self.session).get_attachment_by_id(user_update_data.icon_id)
+            if attach is None:
+                raise NotFoundException("Вложение не найдено")
         upd_user = await UserRepository(self.session).update_user_info(user_id, user_update_data)
         return upd_user
 

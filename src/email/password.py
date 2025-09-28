@@ -2,14 +2,13 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from fastapi import HTTPException
-from src.code.utils import generate_code
 from src.config import settings
 from src.exceptions import IternalServerException
 from .utils import get_stmp
 
 SENDER_EMAIL = settings.SENDER_EMAIL
 
-def send_recovery_code(email: str, recovery_code: str = generate_code()):
+def send_recovery_code(email: str, recovery_code: str):
     smtp_server, smtp_port = get_stmp(SENDER_EMAIL)
 
     subject = 'Код восстановления'

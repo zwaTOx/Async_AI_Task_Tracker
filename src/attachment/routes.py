@@ -7,7 +7,7 @@ from .service import AttachmentService
 attach_router = APIRouter()
 
 @attach_router.post(
-    "",
+    "/icons",
     status_code=status.HTTP_201_CREATED
 )
 async def upload_attachment(

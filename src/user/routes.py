@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Depends, Response, status
 
 from src.database import DbSession
 from .schemes import UserLogin, UserResponse, UserCreate, ResetPasswordData, UserUpdateData
@@ -43,7 +43,7 @@ async def auth_user(
 
 @user_router.patch(
     "/me",
-    response_model=UserResponse
+    response_model=UserResponse,
 )
 async def update_user(
     session: DbSession,
