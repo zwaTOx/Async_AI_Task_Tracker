@@ -15,4 +15,3 @@ class UserLogin(CustomBase):
 
 class ResetPasswordData(CustomBase):
     password: str
-    verify_password: str
