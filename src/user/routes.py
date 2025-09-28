@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Response, status
 
 from src.database import DbSession
-from .schemes import UserLogin, UserResponse, UserCreate, ResetPasswordData
+from .schemes import UserLogin, UserResponse, UserCreate, ResetPasswordData, UserUpdateData
 from .service import UserService
+from .dependencies import CurrentUser
 
 user_router = APIRouter()
 
@@ -39,6 +40,18 @@ async def auth_user(
         "access_token": token,
         "user_id": user_id
     }
+
+@user_router.patch(
+    "/me",
+    response_model=UserResponse
+)
+async def update_user(
+    session: DbSession,
+    user: CurrentUser,
+    user_update_data: UserUpdateData
+):
+    upd_user = await UserService(session).update_user(user.id, user_update_data)
+    return upd_user
 
 @user_router.put(
     "/reset-password",

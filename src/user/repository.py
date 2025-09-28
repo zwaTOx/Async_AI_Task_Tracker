@@ -1,7 +1,7 @@
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from .models import User
-from .schemes import UserCreate, ResetPasswordData
+from .schemes import UserCreate, ResetPasswordData, UserUpdateData
 from .utils import hash_password
 
 class UserRepository:
@@ -26,6 +26,14 @@ class UserRepository:
         await self.session.commit()
         return new_user
     
+    async def update_user_info(self, user_id: int, user_data: UserUpdateData):
+        user = await self.get_by_id(user_id)
+        update_data = user_data.model_dump(exclude_none=True)
+        for key, value in update_data.items():
+            setattr(user, key, value)
+        await self.session.commit()
+        return user
+
     async def update_password(self, user_id, password_data: ResetPasswordData):
         new_hashed_password = hash_password(password_data.password) 
         user = await self.get_by_id(user_id)

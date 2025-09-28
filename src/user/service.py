@@ -1,7 +1,7 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.exceptions import ConflictException, InvalidPasswordException, AuthException, BadRequestException
 from src.code.utils import decode_reset_password_token
-from .schemes import UserCreate, UserResponse, UserLogin, ResetPasswordData
+from .schemes import UserCreate, UserResponse, UserLogin, ResetPasswordData, UserUpdateData
 from .repository import UserRepository
 from .utils import verify_password, generate_auth_token
 
@@ -32,6 +32,10 @@ class UserService:
             raise AuthException
         return generate_auth_token(founded_user.id), founded_user.id
     
+    async def update_user(self, user_id: int, user_update_data: UserUpdateData):
+        upd_user = await UserRepository(self.session).update_user_info(user_id, user_update_data)
+        return upd_user
+
     async def reset_password(self, token: str, password_update_data: ResetPasswordData):
         user_id = decode_reset_password_token(token)
         user = await UserRepository(self.session).get_by_id(user_id)
