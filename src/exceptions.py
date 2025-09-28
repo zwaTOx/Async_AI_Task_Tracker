@@ -31,3 +31,7 @@ class NotFoundException(TaskTrackerHTTPException):
 class IternalServerException(TaskTrackerHTTPException):
     def __init__(self, detail="Ошибка отправки"):
         super().__init__(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
+
+class TooLargeEntityException(TaskTrackerHTTPException):
+    def __init__(self, detail):
+        super().__init__(status_code=status.HTTP_413_CONTENT_TOO_LARGE, detail=detail)

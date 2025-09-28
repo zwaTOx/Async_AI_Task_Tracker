@@ -6,6 +6,7 @@ from src.user.routes import user_router
 from src.project.routes import project_router
 from src.user_project_association.routes import user_project_as_router
 from src.code.routes import code_router
+from src.attachment.routes import attach_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -43,4 +44,7 @@ app.include_router(
 
 app.include_router(
     user_project_as_router, prefix='/api/projects', tags=['User in Project']
+)
+app.include_router(
+    attach_router, prefix="/api/attachments", tags=["Attachment"]
 )
