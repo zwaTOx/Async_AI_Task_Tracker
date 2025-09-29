@@ -46,5 +46,5 @@ app.include_router(
     user_project_as_router, prefix='/api/projects', tags=['User in Project']
 )
 app.include_router(
-    attach_router, prefix="/api/attachments", tags=["Attachment"]
+    attach_router, prefix="/api", tags=["Attachment"]
 )

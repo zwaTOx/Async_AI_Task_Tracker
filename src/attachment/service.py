@@ -4,8 +4,9 @@ from pathlib import Path
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from fastapi import UploadFile
 
+from src.user.repository import UserRepository
 from src.config import settings
-from src.exceptions import TooLargeEntityException, BadRequestException
+from src.exceptions import TooLargeEntityException, BadRequestException, NotFoundException
 from .repository import AttachmentRepository
 from .schemes import AttachResponse
 
@@ -31,3 +32,17 @@ class AttachmentService:
             f.write(contents)
         new_attach = await AttachmentRepository(self.session).add_icon(filename, upload_file.filename, user_id)
         return new_attach
+    
+    async def get_user_icon_file(self, user_id: int):
+        user = await UserRepository(self.session).get_by_id(user_id)
+        if user is None:
+            raise NotFoundException("Пользователь не найден")
+        attach_id = user.icon_id
+        print(attach_id)
+        attachment = await AttachmentRepository(self.session).get_attachment_by_id(attach_id)
+        if attachment is None:
+            raise BadRequestException("Такой иконки нет. Дефолтная иконка")
+        file_path = os.path.join(settings.UPLOAD_DIRECTORY, attachment.system_filename)
+        if not os.path.exists(file_path):
+            raise NotFoundException("Вложение не найдено на сервере")
+        return file_path
