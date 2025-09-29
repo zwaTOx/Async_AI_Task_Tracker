@@ -41,6 +41,16 @@ async def auth_user(
         "user_id": user_id
     }
 
+@user_router.get(
+    "/me",
+    response_model=UserResponse
+)
+async def get_my_profile(
+    session: DbSession,
+    user: CurrentUser
+):
+    return user
+
 @user_router.patch(
     "/me",
     response_model=UserResponse,
