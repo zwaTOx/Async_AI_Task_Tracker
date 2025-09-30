@@ -23,6 +23,18 @@ class CategoryRepository:
         result = await self.session.exec(statement)
         return result.all()
 
+    async def check_project_in_category(self, project_id: int, user_id: int):
+        statement = (
+            select(Category)
+            .join(project_category, Category.id == project_category.c.category_id)
+            .where(
+                (project_category.c.project_id == project_id) &
+                (Category.user_id == user_id)
+            )
+        )
+        result = await self.session.exec(statement)
+        return result.first() is not None
+    
     async def add_project_to_category(self, category_id: int, project_id: int):
         insert_stmt = project_category.insert().values(
             category_id=category_id,
