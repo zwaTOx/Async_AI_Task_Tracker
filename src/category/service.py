@@ -26,3 +26,9 @@ class CategoryService:
         upd_category = await CategoryRepository(self.session).\
             update_category(user_id, category_id, category_update)
         return upd_category
+    
+    async def delete_category(self, category_id, user_id):
+        category = await CategoryRepository(self.session).get_user_category(user_id, category_id)
+        if category is None:
+            raise NotFoundException("Категория не найдена")
+        await CategoryRepository(self.session).delete_category(category_id)

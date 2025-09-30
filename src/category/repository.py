@@ -1,5 +1,8 @@
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from sqlmodel import select
+from sqlmodel import delete, select
+
+from src.user_project_association.models import UserProjectAssociation
 
 from .models import Category
 from .schemes import CategoryCreate, CategoryUpdate
@@ -40,4 +43,13 @@ class CategoryRepository:
             setattr(category, key, value)
         await self.session.commit()
         return category
-    
+
+    async def delete_category(self, category_id: int):
+        update_stmt = update(UserProjectAssociation).where(
+            UserProjectAssociation.category_id == category_id
+        ).values(category_id=None)
+        await self.session.exec(update_stmt)
+        
+        delete_stmt = delete(Category).where(Category.id == category_id)
+        await self.session.exec(delete_stmt)
+        await self.session.commit()

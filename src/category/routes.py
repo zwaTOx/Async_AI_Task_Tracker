@@ -46,8 +46,13 @@ async def update_category(
     updated_category = await CategoryService(session).update_category(user.id, category_id, category_update)
     return updated_category
 
-# @category_router.delete(
-#     "/{category_id}",
-#     status_code=status.HTTP_204_NO_CONTENT
-# )
-# async def delete_category():
+@category_router.delete(
+    "/{category_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_category(
+    session: DbSession,
+    user: CurrentUser,
+    category_id: int
+):
+    await CategoryService(session).delete_category(category_id, user.id)
