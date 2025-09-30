@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from src.database import init_db
 from src.user.routes import user_router
 from src.project.routes import project_router
+from src.category.routes import category_router
 from src.user_project_association.routes import user_project_as_router
 from src.code.routes import code_router
 from src.attachment.routes import attach_router
@@ -37,6 +38,9 @@ app.include_router(
 )
 app.include_router(
     code_router, prefix="/api/restore", tags=["Codes"]
+)
+app.include_router(
+    category_router, prefix="/api/categories", tags = ['Category']
 )
 app.include_router(
     project_router, prefix='/api/projects', tags=['Project']
