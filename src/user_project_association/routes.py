@@ -5,13 +5,13 @@ from src.database import DbSession
 from src.user.dependencies import CurrentUser
 from .service import ProjectAssociationService
 from .schemes import InviteModel, MembershipResponse, UpdateMemberData, MembershipPagination
-from .dependencies import verify_project_admin, vefify_project_member
+from .dependencies import verify_project_admin, verify_project_member
 
 user_project_as_router = APIRouter()
 
 @user_project_as_router.get(
     "{project_id}/members",
-    dependencies=[Depends(vefify_project_member)],
+    dependencies=[Depends(verify_project_member)],
     response_model=MembershipPagination
 )
 async def get_project_members(
@@ -93,7 +93,7 @@ async def delete_project_member(
 
 @user_project_as_router.delete(
     "{project_id}/leave",
-    dependencies=[Depends(vefify_project_member)],
+    dependencies=[Depends(verify_project_member)],
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def leave_project(

@@ -15,7 +15,7 @@ async def verify_project_admin(
     ):
         raise PermissionException("Недостаточно прав для выполнения данного действия")
     
-async def vefify_project_member(
+async def verify_project_member(
     session: DbSession,
     current_user: CurrentUser,
     project_id: int

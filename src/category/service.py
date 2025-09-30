@@ -1,3 +1,4 @@
+from fastapi import HTTPException,status
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from src.exceptions import NotFoundException
@@ -8,8 +9,8 @@ class CategoryService:
     def __init__(self, session: AsyncSession):
         self.session = session
     
-    async def get_categories(self, user_id: int) -> list[CategoryResponse]:
-        categories = await CategoryRepository(self.session).get_categories(user_id) 
+    async def get_categories(self, user_id: int):
+        categories = await CategoryRepository(self.session).get_user_categories_with_projects(user_id) 
         return categories
 
     async def create_category(self, 
@@ -26,9 +27,10 @@ class CategoryService:
         upd_category = await CategoryRepository(self.session).\
             update_category(user_id, category_id, category_update)
         return upd_category
-    
-    async def delete_category(self, category_id, user_id):
-        category = await CategoryRepository(self.session).get_user_category(user_id, category_id)
-        if category is None:
+
+    async def add_project_to_category(self, user_id: int, category_id: int, project_id: int):
+        category = await CategoryRepository(self.session).get_category(category_id, user_id)
+        if not category:
             raise NotFoundException("Категория не найдена")
-        await CategoryRepository(self.session).delete_category(category_id)
+        await CategoryRepository(self.session).add_project_to_category(category_id, project_id)
+        return category

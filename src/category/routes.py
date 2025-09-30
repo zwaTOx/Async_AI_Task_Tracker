@@ -3,6 +3,7 @@ from fastapi import APIRouter, status, Depends
 
 from src.database import DbSession
 from src.user.dependencies import CurrentUser
+from src.user_project_association.dependencies import verify_project_member
 from .service import CategoryService
 from .schemes import CategoryCreate, CategoryResponse, CategoryPagination, CategoryUpdate
 
@@ -10,7 +11,7 @@ category_router = APIRouter()
 
 @category_router.get(
     "",
-    response_model=CategoryPagination
+    # response_model=CategoryPagination
 )
 async def get_categories(
     session: DbSession,
@@ -56,3 +57,22 @@ async def delete_category(
     category_id: int
 ):
     await CategoryService(session).delete_category(category_id, user.id)
+
+@category_router.post(
+    "/{category_id}/projects/{project_id}",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(verify_project_member)],
+    response_model=CategoryResponse  
+)
+async def add_project_to_category(
+    session: DbSession,
+    user: CurrentUser,
+    category_id: int,
+    project_id: int
+):
+    result = await CategoryService(session).add_project_to_category(
+        user_id=user.id,
+        category_id=category_id,
+        project_id=project_id
+    )
+    return result
