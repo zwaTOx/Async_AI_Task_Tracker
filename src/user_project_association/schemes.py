@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from src.models import CustomBase
 from pydantic import Field
 from fastapi import Query
@@ -15,10 +16,18 @@ class InviteProjectData(CustomBase):
     project_id: int
 
 class MembershipResponse(CustomBase):
+    id: int
     user_id: int
+    category_id: Optional[int] = Field(default=None)
     project_id: int
     role: Roles
     joined_at: datetime
+
+class MembershipPagination(CustomBase):
+    items: list[MembershipResponse]
+
+class UpdateUserProject(CustomBase):
+    category_id: Optional[int] = Field(default=None)
 
 class UpdateMemberData(CustomBase):
     role: Update_Roles = Field(default=settings.DEFAULT_PROJECT_ROLE)

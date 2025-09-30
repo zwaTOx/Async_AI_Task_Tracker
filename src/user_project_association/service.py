@@ -1,10 +1,12 @@
 from fastapi import Request
 from sqlalchemy.ext.asyncio.session import AsyncSession
+
 from src.exceptions import PermissionException, NotFoundException, BadRequestException, IternalServerException
 from src.user.repository import UserRepository
 from src.code.utils import create_invite_project_token, decode_invite_project_token
 from src.email.invite import send_project_invite
-from .schemes import InviteModel, UpdateMemberData, MembershipResponse
+from src.category.repository import CategoryRepository
+from .schemes import InviteModel, UpdateMemberData, MembershipResponse, UpdateUserProject
 from .repository import UserProjectAssociationRepository
 from src.config import settings
 
@@ -22,7 +24,7 @@ class ProjectAssociationService:
     async def get_project_members(self, 
         user_id: int, 
         project_id: int
-    ):
+    ) -> MembershipResponse:
         memberships = await UserProjectAssociationRepository(self.session).get_project_memberships(project_id)
         return memberships
     
@@ -84,6 +86,14 @@ class ProjectAssociationService:
             update_member(member_id, project_id, update_data)
         return upd_membership
         
+    async def update_user_project(self,
+        user_id: int, project_id: int, project_data: UpdateUserProject) -> MembershipResponse:
+        category = await CategoryRepository(self.session).get_category(project_data.category_id, user_id)
+        if project_data.category_id is not None and category is None:
+            raise NotFoundException("Категория не найдена")
+        upd_membership = await UserProjectAssociationRepository(self.session).update_user_project(user_id, project_id, project_data)
+        print(upd_membership)
+        return upd_membership
 
     async def delete_project_member(self,
             user_id: int, project_id: int, del_user_id: int):

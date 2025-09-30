@@ -13,6 +13,11 @@ class CategoryRepository:
         result = await self.session.exec(statement)
         return result.all()
 
+    async def get_category(self, category_id: int, user_id: int):
+        statement = select(Category).filter(Category.id==category_id, Category.user_id==user_id)
+        result = await self.session.exec(statement)
+        return result.first()
+
     async def get_user_category(self, user_id: int, category_id: int):
         statement = select(Category).filter(Category.id==category_id, Category.user_id == user_id)
         result = await self.session.exec(statement)
