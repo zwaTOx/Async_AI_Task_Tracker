@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from .models import UserProjectAssociation
-from .schemes import InviteProjectData, UpdateMemberData, MembershipResponse, UpdateUserProject
+from .schemes import InviteProjectData, UpdateMemberData, MembershipResponse
 from .utils import Roles
 
 class UserProjectAssociationRepository:
@@ -40,16 +40,6 @@ class UserProjectAssociationRepository:
         await self.session.commit()
         print(f"Association created: {new_assoc.id}")
         return new_assoc
-
-    async def update_user_project(self, 
-            user_id: int, project_id: int, project_data: UpdateUserProject):
-        membership = await self.get_membership(user_id, project_id)
-        update_data = project_data.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
-            setattr(membership, key, value)
-        await self.session.commit()
-        await self.session.refresh(membership)
-        return membership
 
     async def update_member(self,
         member_id: int, project_id: int, member_data: UpdateMemberData

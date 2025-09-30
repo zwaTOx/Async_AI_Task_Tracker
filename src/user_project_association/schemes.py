@@ -26,8 +26,5 @@ class MembershipResponse(CustomBase):
 class MembershipPagination(CustomBase):
     items: list[MembershipResponse]
 
-class UpdateUserProject(CustomBase):
-    category_id: Optional[int] = Field(default=None)
-
 class UpdateMemberData(CustomBase):
     role: Update_Roles = Field(default=settings.DEFAULT_PROJECT_ROLE)

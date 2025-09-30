@@ -4,7 +4,7 @@ from src.config import settings
 from src.database import DbSession
 from src.user.dependencies import CurrentUser
 from .service import ProjectAssociationService
-from .schemes import InviteModel, MembershipResponse, UpdateMemberData, UpdateUserProject, MembershipPagination
+from .schemes import InviteModel, MembershipResponse, UpdateMemberData, MembershipPagination
 from .dependencies import verify_project_admin, vefify_project_member
 
 user_project_as_router = APIRouter()
@@ -54,21 +54,6 @@ async def confirm_invite(
 ):
     project_data = await ProjectAssociationService(session).confirm_invite(invite_token)
     return project_data
-
-@user_project_as_router.patch(
-    "/{project_id}/update",
-    dependencies=[Depends(vefify_project_member)],
-    response_model=MembershipResponse
-)
-async def update_user_project(
-    session: DbSession,
-    user: CurrentUser,
-    project_id: int,
-    project_data: UpdateUserProject
-):
-    membership = await ProjectAssociationService(session).update_user_project(user.id, project_id, project_data)
-    return membership
-    
 
 @user_project_as_router.put(
     "/{project_id}/members/{member_id}",
