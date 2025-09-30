@@ -4,7 +4,7 @@ from fastapi import APIRouter, status, Depends
 from src.database import DbSession
 from src.user.dependencies import CurrentUser
 from .service import CategoryService
-from .schemes import CategoryCreate, CategoryResponse, CategoryPagination
+from .schemes import CategoryCreate, CategoryResponse, CategoryPagination, CategoryUpdate
 
 category_router = APIRouter()
 
@@ -33,3 +33,16 @@ async def create_category(
 ):
     new_category = await CategoryService(session).create_category(user.id, category_data)
     return new_category
+
+@category_router.patch(
+    "/{category_id}",
+)
+async def update_category(
+    session: DbSession,
+    user: CurrentUser,
+    category_id: int,
+    category_update: CategoryUpdate
+):
+    updated_category = await CategoryService(session).update_category(user.id, category_id, category_update)
+    return updated_category
+
