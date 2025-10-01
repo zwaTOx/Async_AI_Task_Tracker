@@ -11,7 +11,8 @@ class CategoryService:
     
     async def get_categories(self, user_id: int):
         categories = await CategoryRepository(self.session).get_user_categories_with_projects(user_id) 
-        return categories
+        projects = await CategoryRepository(self.session).get_user_projects_without_categories(user_id)
+        return categories, projects
 
     async def create_category(self, 
             user_id: int, category_data: CategoryCreate) -> CategoryResponse:
@@ -31,7 +32,7 @@ class CategoryService:
     async def add_project_to_category(self, user_id: int, category_id: int, project_id: int):
         category = await CategoryRepository(self.session).get_category(category_id, user_id)
         if not CategoryRepository(self.session).check_project_in_category(project_id, user_id):
-            raise BadRequestException("Проект уже добавлен в категорию")
+            raise BadRequestException("Проект уже добавлен в проект")
         if not category:
             raise NotFoundException("Категория не найдена")
         await CategoryRepository(self.session).add_project_to_category(category_id, project_id)

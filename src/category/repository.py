@@ -22,6 +22,24 @@ class CategoryRepository:
         )
         result = await self.session.exec(statement)
         return result.all()
+    
+    async def get_user_projects_without_categories(self, user_id: int) -> list[Project]:
+        projects_with_categories_subquery = (
+        select(project_category.c.project_id)
+        .distinct()
+        .subquery()
+        )
+        
+        statement = (
+            select(Project)
+            .join(UserProjectAssociation, Project.id == UserProjectAssociation.project_id)
+            .where(
+                (UserProjectAssociation.user_id == user_id) &
+                (~Project.id.in_(select(projects_with_categories_subquery.c.project_id)))
+            )
+        )
+        result = await self.session.exec(statement)
+        return result.all()
 
     async def check_project_in_category(self, project_id: int, user_id: int):
         statement = (

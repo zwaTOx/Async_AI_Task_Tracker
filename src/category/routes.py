@@ -17,10 +17,11 @@ async def get_categories(
     session: DbSession,
     user: CurrentUser
 ):
-    categories = await CategoryService(session).get_categories(user.id)
+    categories, projects = await CategoryService(session).get_categories(user.id)
     return {
-        "items": categories
-    }
+            "categories": categories,
+            "projects": projects
+        }
 
 @category_router.post(
     "",
