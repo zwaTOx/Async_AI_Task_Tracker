@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, status, UploadFile
+from fastapi import APIRouter, Depends, File, status, UploadFile, Response
 from fastapi.responses import FileResponse
 
 from src.user.dependencies import CurrentUser
@@ -25,10 +25,16 @@ async def upload_attachment(
 )
 async def get_user_icon(
     session: DbSession,
+    response: Response,
     user: CurrentUser,
     user_id: int
 ):
     file_path = await AttachmentService(session).get_user_icon_file(user_id)
+    response.headers.update({
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    })
     return FileResponse(file_path)
 
 @attach_router.get(
@@ -38,7 +44,13 @@ async def get_user_icon(
 async def get_project_icon(
     session: DbSession,
     user: CurrentUser,
+    response: Response,
     project_id: int
 ):
+    response.headers.update({
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    })
     file_path = await AttachmentService(session).get_project_icon_file(project_id)
     return FileResponse(file_path)
