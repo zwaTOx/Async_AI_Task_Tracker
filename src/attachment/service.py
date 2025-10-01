@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from fastapi import UploadFile
 
 from src.user.repository import UserRepository
+from src.project.repository import ProjectRepository
 from src.config import settings
 from src.exceptions import TooLargeEntityException, BadRequestException, NotFoundException
 from .repository import AttachmentRepository
@@ -39,6 +40,19 @@ class AttachmentService:
             raise NotFoundException("Пользователь не найден")
         attach_id = user.icon_id
         print(attach_id)
+        attachment = await AttachmentRepository(self.session).get_attachment_by_id(attach_id)
+        if attachment is None:
+            raise BadRequestException("Такой иконки нет. Дефолтная иконка")
+        file_path = os.path.join(settings.UPLOAD_DIRECTORY, attachment.system_filename)
+        if not os.path.exists(file_path):
+            raise NotFoundException("Вложение не найдено на сервере")
+        return file_path
+    
+    async def get_project_icon_file(self, project_id: int):
+        project = await ProjectRepository(self.session).get_project(project_id)
+        if project is None:
+            raise NotFoundException("Проект не найден")
+        attach_id = project.icon_id
         attachment = await AttachmentRepository(self.session).get_attachment_by_id(attach_id)
         if attachment is None:
             raise BadRequestException("Такой иконки нет. Дефолтная иконка")

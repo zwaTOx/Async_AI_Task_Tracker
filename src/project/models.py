@@ -11,9 +11,8 @@ class Project(Base):
     name: Mapped[str]
     description: Mapped[str]
 
+    icon_id: Mapped[int] = mapped_column(ForeignKey("attachments.id"), nullable=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    categories = relationship(
-        "Category", 
-        secondary=project_category, 
-        back_populates="projects"
-    )
+    categories = relationship("Category", secondary=project_category, back_populates="projects")
+
+    members = relationship("User", secondary="userprojectassociations", back_populates="projects")

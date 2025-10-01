@@ -1,7 +1,8 @@
-from fastapi import APIRouter, File, status, UploadFile
+from fastapi import APIRouter, Depends, File, status, UploadFile
 from fastapi.responses import FileResponse
 
 from src.user.dependencies import CurrentUser
+from src.user_project_association.dependencies import verify_project_member
 from src.database import DbSession
 from .service import AttachmentService
 
@@ -28,4 +29,16 @@ async def get_user_icon(
     user_id: int
 ):
     file_path = await AttachmentService(session).get_user_icon_file(user_id)
+    return FileResponse(file_path)
+
+@attach_router.get(
+    "projects/{project_id}/icon",
+    dependencies=[Depends(verify_project_member)]
+)
+async def get_project_icon(
+    session: DbSession,
+    user: CurrentUser,
+    project_id: int
+):
+    file_path = await AttachmentService(session).get_project_icon_file(project_id)
     return FileResponse(file_path)

@@ -14,6 +14,7 @@ class ProjectCreate(ProjectBase):
 class ProjectUpdate(ProjectBase):
     name: Optional[str] = Field(None, min_length=5, max_length=100)
     description: Optional[str] = Field(None, max_length=300)
+    icon_id: Optional[int] = Field(None)
 
 class ProjectResponse(CustomBase):
     id: int
