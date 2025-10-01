@@ -11,7 +11,7 @@ category_router = APIRouter()
 
 @category_router.get(
     "",
-    # response_model=CategoryPagination
+    response_model=CategoryPagination
 )
 async def get_categories(
     session: DbSession,

@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import Field
 
 from src.models import CustomBase
-
+from src.project.schemes import ProjectResponse
 
 class CategoryCreate(CustomBase):
     name: str= Field(max_length=30) 
@@ -16,5 +16,16 @@ class CategoryResponse(CategoryCreate):
     id: int
     user_id: int
 
+class CategoryBase(CustomBase):
+    id: int
+    name: str
+    color: str
+    user_id: int
+
+class CategoryWithProjectsResponse(CategoryBase):
+    projects: list[ProjectResponse] = []
+
 class CategoryPagination(CustomBase):
-    items: list[CategoryResponse]
+    categories: list[CategoryWithProjectsResponse]
+    projects: list[ProjectResponse]
+    
