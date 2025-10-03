@@ -93,3 +93,8 @@ class CategoryRepository:
             setattr(category, key, value)
         await self.session.commit()
         return category
+    
+    async def delete_category(self, category_id: int):
+        statement = delete(Category).where(Category.id == category_id)
+        await self.session.exec(statement)
+        await self.session.commit()
