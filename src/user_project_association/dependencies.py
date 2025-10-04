@@ -9,7 +9,7 @@ async def verify_project_admin(
     project_id: int
 ):
     """Зависимость для проверки прав администратора/владельца проекта."""
-    if not await ProjectAssociationService(session).is_project_admin_or_owner(
+    if not await ProjectAssociationService(session).is_project_roles(
         user_id=current_user.id, 
         project_id=project_id
     ):
@@ -22,3 +22,15 @@ async def verify_project_member(
 ):
     """Зависимость для проверки членства в проекте."""
     await ProjectAssociationService(session).get_project_member(current_user.id, project_id)
+
+async def verify_create_task_perms(
+    session: DbSession,
+    current_user: CurrentUser,
+    project_id: int):
+    if await ProjectAssociationService(session).is_project_roles(
+        user_id=current_user.id, 
+        project_id=project_id,
+        roles=["READER"]
+    ):
+        raise PermissionException("Недостаточно прав для выполнения данного действия")
+    

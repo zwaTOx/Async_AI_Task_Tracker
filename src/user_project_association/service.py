@@ -14,12 +14,14 @@ class ProjectAssociationService:
     def __init__(self, session: AsyncSession):
         self.session = session
     
-    async def is_project_admin_or_owner(self, project_id: int, user_id: int) -> bool:
+    async def is_project_roles(self, 
+            project_id: int, 
+            user_id: int, 
+            roles: list[str] = ['ADMINISTRATOR', "OWNER"]) -> bool:
         membership = await UserProjectAssociationRepository(self.session).get_membership(user_id, project_id)
         if membership is None:
-            raise PermissionException("Пользователь не является частью проекта")
-        print(membership.role)
-        return membership.role in ['ADMINISTRATOR', "OWNER"]
+            raise PermissionException("Недостаточно прав для выполения операции")
+        return membership.role in roles
 
     async def get_project_members(self, 
         user_id: int, 

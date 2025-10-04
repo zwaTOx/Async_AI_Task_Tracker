@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, status
 
 from src.database import DbSession
 from src.user.dependencies import CurrentUser
-from src.user_project_association.dependencies import verify_project_member
+from src.user_project_association.dependencies import verify_project_member, verify_create_task_perms
 from .service import TaskService
 from .schemas import TaskCreate, TaskPagination, TaskResponse
 
@@ -25,7 +25,7 @@ async def get_project_tasks(
 @task_router.post(
     "/{project_id}",
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(verify_project_member)]
+    dependencies=[Depends(verify_project_member), Depends(verify_create_task_perms)]
 )
 async def create_task(
     session: DbSession,
