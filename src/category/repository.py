@@ -98,3 +98,11 @@ class CategoryRepository:
         statement = delete(Category).where(Category.id == category_id)
         await self.session.exec(statement)
         await self.session.commit()
+
+    async def remove_project_from_category(self, category_id: int, project_id: int):
+        delete_stmt = delete(project_category).where(
+            (project_category.c.category_id == category_id) &
+            (project_category.c.project_id == project_id)
+        )
+        await self.session.exec(delete_stmt)
+        await self.session.commit()

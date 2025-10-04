@@ -77,3 +77,19 @@ async def add_project_to_category(
         project_id=project_id
     )
     return result
+
+@category_router.delete(
+    "/{category_id}/projects/{project_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_project_from_category(
+    session: DbSession,
+    user: CurrentUser,
+    category_id: int,
+    project_id: int
+):
+    await CategoryService(session).remove_project_from_category(
+        user_id=user.id,
+        category_id=category_id,
+        project_id=project_id
+    )

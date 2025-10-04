@@ -44,3 +44,12 @@ class CategoryService:
             raise NotFoundException("Категория не найдена")
         await CategoryRepository(self.session).add_project_to_category(category_id, project_id)
         return category
+    
+    async def remove_project_from_category(self, user_id: int, category_id: int, project_id: int):
+        category = await CategoryRepository(self.session).get_category(category_id, user_id)
+        is_project_in_category = await CategoryRepository(self.session).check_project_in_category(project_id, user_id)
+        if not category:
+            raise NotFoundException("Категория не найдена")
+        if not is_project_in_category:
+            raise BadRequestException("Проект не находится в этой категории")
+        await CategoryRepository(self.session).remove_project_from_category(category_id, project_id)
