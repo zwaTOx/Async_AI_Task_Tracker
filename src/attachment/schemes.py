@@ -1,5 +1,5 @@
 from typing import Literal
-from src.models import CustomBase
+from src.schemas import CustomBase
 
 class AttachResponse(CustomBase):
     user_filename: str

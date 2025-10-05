@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import Field
 
-from src.models import CustomBase
+from src.schemas import CustomBase
 from src.project.schemes import ProjectResponse
 
 class CategoryCreate(CustomBase):

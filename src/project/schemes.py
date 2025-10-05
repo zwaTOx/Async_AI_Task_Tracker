@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlmodel import Field
 
-from src.models import CustomBase
+from src.schemas import CustomBase
 
 
 class ProjectBase(CustomBase):

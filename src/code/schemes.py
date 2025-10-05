@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.models import CustomBase
+from src.schemas import CustomBase
 
 
 class CodeResponse(CustomBase):

@@ -2,7 +2,18 @@ from datetime import datetime
 from typing import Literal, Optional
 
 from pydantic import Field
-from src.models import CustomBase
+from src.schemas import CustomBase, TimeStampSchema
+
+class TaskBase(CustomBase):
+    title: str
+    description: Optional[str] = None
+    color: str
+    status: str
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+    creator_id: int
+    performer_id: Optional[int] = None
+    project_id: int
 
 class TaskCreate(CustomBase):
     title: str
@@ -12,17 +23,8 @@ class TaskCreate(CustomBase):
     
     performer_id: Optional[int] = Field(default=None)
 
-class TaskResponse(CustomBase):
-    id: int
-    title: str
-    description: Optional[str]
-    color: str
-    status: str
-    start: Optional[datetime]
-    end: Optional[datetime]
-    creator_id: int
-    performer_id: Optional[int]
-    project_id: int
+class TaskResponse(TimeStampSchema, TaskBase):
+    pass
 
 class TaskPagination(CustomBase):
     items: list[TaskResponse]

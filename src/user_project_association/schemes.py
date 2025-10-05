@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from src.models import CustomBase
+from src.schemas import CustomBase
 from pydantic import Field
 from fastapi import Query
 from .utils import Roles, Inv_Roles, Update_Roles
