@@ -37,3 +37,8 @@ class TaskRepository:
             setattr(task, key, value)
         await self.session.commit()
         return task
+    
+    async def delete_task(self, task_id: int):
+        task = await self.get_task(task_id)
+        await self.session.delete(task)
+        await self.session.commit()

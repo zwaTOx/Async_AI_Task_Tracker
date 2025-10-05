@@ -24,16 +24,12 @@ class TaskService:
     
     async def update_task(self,
             user_id: int, project_id: int, task_id: int, task_update: TaskUpdate):
-        membership = await UserProjectAssociationRepository(self.session).get_membership(user_id, project_id)
-        task = await TaskRepository(self.session).get_task(task_id)
-        if task is None or task.project_id != project_id:
-            raise NotFoundException("Задача не найдена в проекте")
-        if membership.role == "USER" and task.creator_id != user_id:
-            raise PermissionError("Недостаточно прав для выполнения данной операции")
-        elif task_update.performer_id is not None and task_update.performer_id!=0:
+        if task_update.performer_id is not None and task_update.performer_id!=0:
             performer = await UserProjectAssociationRepository(self.session).get_membership(task_update.performer_id, project_id)
             if performer is None:
                 raise BadRequestException("Исполнитель не является участником проекта")
         upd_task = await TaskRepository(self.session).update_task(task_id, task_update)
         return upd_task
         
+    async def delete_task(self, user_id: int, project_id: int, task_id: int):
+        await TaskRepository(self.session).delete_task(task_id)

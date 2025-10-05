@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 
 from src.database import DbSession
+from src.task.dependencies import verify_update_task_perms
 from src.user.dependencies import CurrentUser
 from src.user_project_association.dependencies import verify_project_member, verify_create_task_perms
 from .service import TaskService
@@ -39,7 +40,7 @@ async def create_task(
 
 @task_router.patch(
     "/{project_id}/tasks/{task_id}",
-    dependencies=[Depends(verify_project_member), Depends(verify_create_task_perms)],
+    dependencies=[Depends(verify_project_member), Depends(verify_update_task_perms)],
     response_model=TaskResponse
 )
 async def update_task(
@@ -51,3 +52,16 @@ async def update_task(
 ):
     upd_task = await TaskService(session).update_task(user.id, project_id, task_id, task_update)
     return upd_task
+
+@task_router.delete(
+    "/{project_id}/tasks/{task_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(verify_project_member), Depends(verify_update_task_perms)]
+)
+async def delete_task(
+    session: DbSession,
+    user: CurrentUser,
+    project_id: int,
+    task_id: int,
+):
+    await TaskService(session).delete_task(user.id, project_id, task_id)
