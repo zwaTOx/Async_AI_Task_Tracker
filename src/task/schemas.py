@@ -8,9 +8,9 @@ class TaskCreate(CustomBase):
     title: str
     description: Optional[str]
     color: str
-    status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = "Назначена"
+    status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(default="Назначена")
     
-    performer_id: Optional[int] = None
+    performer_id: Optional[int] = Field(default=None)
 
 class TaskResponse(CustomBase):
     id: int
@@ -28,9 +28,9 @@ class TaskPagination(CustomBase):
     items: list[TaskResponse]
 
 class TaskUpdate(CustomBase):
-    title: Optional[str] = Field(None)
-    description: Optional[str] = Field(None)
-    color: Optional[str] = Field(None)
-    status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(None)
+    title: Optional[str] = Field(default=None)
+    description: Optional[str] = Field(default=None)
+    color: Optional[str] = Field(default=None)
+    status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(default=None)
     
-    performer_id: Optional[int] = Field(None, description="ID исполнителя. Если передать 0, исполнитель будет сброшен")
+    performer_id: Optional[int] = Field(default=None, description="ID исполнителя. Если передать 0, исполнитель будет сброшен")
