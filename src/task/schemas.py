@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import Literal, Optional
+
+from pydantic import Field
 from src.models import CustomBase
 
 class TaskCreate(CustomBase):
@@ -24,3 +26,11 @@ class TaskResponse(CustomBase):
 
 class TaskPagination(CustomBase):
     items: list[TaskResponse]
+
+class TaskUpdate(CustomBase):
+    title: Optional[str] = Field(None)
+    description: Optional[str] = Field(None)
+    color: Optional[str] = Field(None)
+    status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(None)
+    
+    performer_id: Optional[int] = Field(None, description="ID исполнителя. Если передать 0, исполнитель будет сброшен")
