@@ -1,8 +1,9 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
+import asyncio
 
 from src.code.repository import CodeRepository
 from src.email.password import send_recovery_code
-from src.exceptions import BadRequestException
+from src.exceptions import BadRequestException, IternalServerException
 from src.user.repository import UserRepository
 from .utils import generate_code
 from .utils import create_reset_password_token, decode_reset_password_token
@@ -16,7 +17,7 @@ class CodeService:
         if founded_user is None:
             raise BadRequestException("Пользователя с таким email не существует")
         code = generate_code()
-        send_recovery_code(email, code)
+        asyncio.create_task(send_recovery_code(email, code))
         await CodeRepository(self.session).create_restore_code(founded_user.id, code)
         return code, founded_user.id
     

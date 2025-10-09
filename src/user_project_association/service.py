@@ -1,5 +1,6 @@
 from fastapi import Request
 from sqlalchemy.ext.asyncio.session import AsyncSession
+import asyncio
 
 from src.exceptions import PermissionException, NotFoundException, BadRequestException, IternalServerException
 from src.user.repository import UserRepository
@@ -59,10 +60,8 @@ class ProjectAssociationService:
             raise BadRequestException("Пользователь уже является частью проекта")
         invite_token = create_invite_project_token(project_id, founded_user.id, inv_role)
         url = f"{settings.BASE_URL}/users/invite?access_token={invite_token}"
-        result = send_project_invite(founded_user.email, "Noname", "Noname", url)
-        if not result:
-            raise IternalServerException
-        
+        asyncio.create_task(send_project_invite(founded_user.email, "Noname", "Noname", url))
+
     async def confirm_invite(self, 
         invite_token: str
     ):

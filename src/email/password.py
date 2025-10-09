@@ -1,14 +1,16 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import aiosmtplib
 from fastapi import HTTPException
 from src.config import settings
 from src.exceptions import IternalServerException
 from .utils import get_stmp
 
 SENDER_EMAIL = settings.SENDER_EMAIL
+SENDER_EMAIL_PASSWORD = settings.SENDER_EMAIL_PASSWORD
 
-def send_recovery_code(email: str, recovery_code: str):
+async def send_recovery_code(email: str, recovery_code: str):
     smtp_server, smtp_port = get_stmp(SENDER_EMAIL)
 
     subject = 'Код восстановления'
@@ -21,11 +23,16 @@ def send_recovery_code(email: str, recovery_code: str):
     msg.attach(MIMEText(body, 'html'))
 
     try:
-        with smtplib.SMTP(smtp_server, smtp_port, timeout=120) as host:
-            host.starttls()
-            host.login(SENDER_EMAIL, settings.SENDER_EMAIL_PASSWORD)
-            host.sendmail(SENDER_EMAIL, email, msg.as_string())
-        print("Код восстановления отправлен на", email)
+        await aiosmtplib.send(
+            msg,
+            hostname=smtp_server,
+            port=smtp_port,
+            username=SENDER_EMAIL,
+            password=SENDER_EMAIL_PASSWORD,
+            use_tls=True,
+            start_tls=True,  
+        )
+        return True
     except Exception as e:
-        raise IternalServerException(detail="Ошибка отправки кода на почту")
-    return recovery_code
+        print(f"Ошибка при отправке приглашения: {e}")
+        return False

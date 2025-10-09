@@ -8,18 +8,25 @@ from .utils import get_stmp
 SENDER_EMAIL = settings.SENDER_EMAIL
 SENDER_EMAIL_PASSWORD = settings.SENDER_EMAIL_PASSWORD
 
-def send_project_invite(
+import aiosmtplib
+import asyncio
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+
+async def send_project_invite(
     recipient_email: str,
     inviter_name: str,
     project_name: str,
     url: str,
-):
+) -> bool:
     """
-    Отправляет приглашение в проект по email
+    Асинхронно отправляет приглашение в проект по email
     :param recipient_email: Email получателя
     :param inviter_name: Имя приглашающего
     :param project_name: Название проекта
-    :param invite_url: Ссылка для принятия приглашения
+    :param url: Ссылка для принятия приглашения
+    :return: True если отправка успешна, False в случае ошибки
     """
     smtp_server, smtp_port = get_stmp(SENDER_EMAIL)
     
@@ -43,13 +50,19 @@ def send_project_invite(
     msg.attach(MIMEText(body, 'html'))
 
     try:
-        with smtplib.SMTP(smtp_server, smtp_port) as host:
-            host.starttls()
-            host.login(SENDER_EMAIL, SENDER_EMAIL_PASSWORD)
-            host.sendmail(SENDER_EMAIL, recipient_email, msg.as_string())
+        # Асинхронная отправка через aiosmtplib
+        await aiosmtplib.send(
+            msg,
+            hostname=smtp_server,
+            port=smtp_port,
+            username=SENDER_EMAIL,
+            password=SENDER_EMAIL_PASSWORD,
+            use_tls=True,
+            start_tls=True,  # Включаем STARTTLS
+        )
         print(f"Приглашение в проект отправлено на {recipient_email}")
         return True
     except Exception as e:
-        print(f"Ошибка при отправке приглашения:", e)
+        print(f"Ошибка при отправке приглашения: {e}")
         return False
 
