@@ -9,6 +9,7 @@ from src.user_project_association.routes import user_project_as_router
 from src.code.routes import code_router
 from src.attachment.routes import attach_router
 from src.task.routes import task_router
+from src.subtask.routes import subtask_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -55,4 +56,7 @@ app.include_router(
 )
 app.include_router(
     task_router, prefix="/api/projects",  tags=["Task"]
+)
+app.include_router(
+    subtask_router, prefix="/api", tags=["Subtask"]
 )
