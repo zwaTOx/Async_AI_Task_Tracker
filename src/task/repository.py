@@ -1,5 +1,6 @@
-from typing import List
-from sqlalchemy import select
+from datetime import datetime
+from typing import List, Optional
+from sqlalchemy import and_, func, or_, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.exceptions import PermissionException
@@ -15,6 +16,43 @@ class TaskRepository:
         result = await self.session.exec(statement)
         return result.scalars().all()
 
+    async def get_tasks_by_date_range(self, 
+        user_id: int,
+        project_ids: List[int],
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ):
+        statement = select(Task).where(Task.project_id.in_(project_ids))
+        
+        if start_date and end_date:
+            start_date_date = start_date.date() if isinstance(start_date, datetime) else start_date
+            end_date_date = end_date.date() if isinstance(end_date, datetime) else end_date
+            
+            statement = statement.where(
+                or_(
+                    # Задачи без даты начала (показываем всегда)
+                    Task.start.is_(None),
+                    
+                    # Задачи, которые начинаются в диапазоне
+                    and_(
+                        Task.start.isnot(None),
+                        func.date(Task.start) >= start_date_date,
+                        func.date(Task.start) <= end_date_date
+                    ),
+                    
+                    # Задачи, которые длятся и пересекаются с диапазоном
+                    and_(
+                        Task.start.isnot(None),
+                        Task.end.isnot(None),
+                        func.date(Task.start) <= end_date_date,
+                        func.date(Task.end) >= start_date_date
+                    )
+                )
+            )
+        
+        result = await self.session.exec(statement)
+        return result.scalars().all()
+    
     async def get_task(self, task_id: int):
         statement = select(Task).filter(Task.id==task_id)
         result = await self.session.exec(statement)

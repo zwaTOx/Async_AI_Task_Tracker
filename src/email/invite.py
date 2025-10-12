@@ -50,7 +50,6 @@ async def send_project_invite(
     msg.attach(MIMEText(body, 'html'))
 
     try:
-        # Асинхронная отправка через aiosmtplib
         await aiosmtplib.send(
             msg,
             hostname=smtp_server,
@@ -58,7 +57,7 @@ async def send_project_invite(
             username=SENDER_EMAIL,
             password=SENDER_EMAIL_PASSWORD,
             use_tls=True,
-            start_tls=True,  # Включаем STARTTLS
+            start_tls=True,  
         )
         print(f"Приглашение в проект отправлено на {recipient_email}")
         return True

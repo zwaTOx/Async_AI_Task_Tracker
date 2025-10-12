@@ -5,6 +5,7 @@ from pydantic import Field
 from src.schemas import CustomBase, TimeStampSchema
 
 class TaskBase(CustomBase):
+    id: int
     title: str
     description: Optional[str] = None
     color: str
@@ -20,7 +21,8 @@ class TaskCreate(CustomBase):
     description: Optional[str]
     color: str
     status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(default="Назначена")
-    
+    start: Optional[datetime] = Field(default=None)
+    end: Optional[datetime] = Field(default=None)
     performer_id: Optional[int] = Field(default=None)
 
 class TaskResponse(TimeStampSchema, TaskBase):

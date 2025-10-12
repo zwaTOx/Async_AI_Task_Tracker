@@ -1,5 +1,6 @@
-from typing import List
-from fastapi import APIRouter, Depends, status
+from datetime import timedelta, datetime
+from typing import List, Optional
+from fastapi import APIRouter, Depends, Query, status
 
 from src.database import DbSession
 from src.task.dependencies import verify_update_task_perms
@@ -18,9 +19,30 @@ task_router = APIRouter()
 async def get_project_tasks(
     session: DbSession,
     user: CurrentUser,
-    project_id: int
+    project_id: int,
 ):
     tasks = await TaskService(session).get_tasks(project_id)
+    return {"items" :tasks}
+
+@task_router.get(
+    "/tasks",
+    response_model=TaskPagination
+)
+async def get_all_tasks_by_date(
+    session: DbSession,
+    user: CurrentUser,
+    date: datetime = Query(datetime.now(), description="Начальная дата"),
+    days_after: int = Query(7, description="Количество дней после указанной даты", ge=1),
+    project_ids: Optional[List[int]] = Query(None, description="ID проектов (опционально)")
+):
+    end_date = date + timedelta(days=days_after)
+    
+    tasks = await TaskService(session).get_tasks_by_date_range(
+        user_id=user.id,
+        project_ids=project_ids,
+        start_date=date,
+        end_date=end_date
+    )
     return {"items" :tasks}
 
 @task_router.post(
