@@ -32,7 +32,7 @@ async def get_all_tasks_by_date(
     session: DbSession,
     user: CurrentUser,
     date: datetime = Query(datetime.now(), description="Начальная дата"),
-    days_after: int = Query(7, description="Количество дней после указанной даты", ge=1),
+    days_after: int = Query(7, description="Количество дней после указанной даты", ge=0),
     project_ids: Optional[List[int]] = Query(None, description="ID проектов (опционально)")
 ):
     end_date = date + timedelta(days=days_after)
