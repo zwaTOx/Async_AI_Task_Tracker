@@ -1,6 +1,6 @@
 from typing import Literal
 from sqlalchemy import DateTime, ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 
 from src.models import TimeStampMixin
@@ -18,6 +18,8 @@ class Task(Base, TimeStampMixin):
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     performer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
+
+    subtasks = relationship('Subtask', backref='task', cascade="all, delete-orphan")
     #tags
     #file_id
 

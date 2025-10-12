@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.exceptions import BadRequestException, PermissionException
-from .schemas import TaskCreate, TaskResponse, TaskUpdate
+from .schemas import TaskCreate, TaskResponse, TaskResponseWithSubtasks, TaskUpdate
 from src.user_project_association.repository import UserProjectAssociationRepository
 from src.project.repository import ProjectRepository
 from .repository import TaskRepository
@@ -39,6 +39,12 @@ class TaskService:
         end_date=end_date
     )
         return tasks
+
+    async def get_task_by_id(self, project_id: int, task_id: int) -> TaskResponseWithSubtasks:
+        task = await TaskRepository(self.session).get_task_with_subtasks(task_id)
+        if task is None or task.project_id != project_id:
+            raise BadRequestException("Задача не найдена")
+        return task
 
     async def create_task(self,
             user_id: int, project_id: int, task_create: TaskCreate): 

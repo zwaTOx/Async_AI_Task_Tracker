@@ -3,6 +3,7 @@ from typing import Literal, Optional
 
 from pydantic import Field
 from src.schemas import CustomBase, TimeStampSchema
+from src.subtask.schemas import SubtaskResponse 
 
 class TaskBase(CustomBase):
     id: int
@@ -27,6 +28,9 @@ class TaskCreate(CustomBase):
 
 class TaskResponse(TimeStampSchema, TaskBase):
     pass
+
+class TaskResponseWithSubtasks(TaskResponse):
+    subtasks: list[SubtaskResponse]
 
 class TaskPagination(CustomBase):
     items: list[TaskResponse]

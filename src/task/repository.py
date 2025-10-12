@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 from sqlalchemy import and_, func, or_, select
+from sqlalchemy.orm import selectinload
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.exceptions import PermissionException
 from .models import Task
-from .schemas import TaskCreate, TaskResponse, TaskUpdate
+from .schemas import TaskCreate, TaskResponse, TaskUpdate, TaskResponseWithSubtasks
 
 class TaskRepository:
     def __init__(self, session: AsyncSession):
@@ -56,7 +57,12 @@ class TaskRepository:
         result = await self.session.exec(statement)
         return result.scalars().first()
 
-    async def create_task(self, user_id: int, project_id: int, task_data: TaskCreate) -> Task:
+    async def get_task_with_subtasks(self, task_id: int) -> TaskResponseWithSubtasks:
+        statement = select(Task).where(Task.id == task_id).options(selectinload(Task.subtasks))
+        result = await self.session.exec(statement)
+        return result.scalars().first()
+
+    async def create_task(self, user_id: int, project_id: int, task_data: TaskCreate) -> TaskResponse:
         new_task = Task(creator_id=user_id, project_id=project_id, **task_data.model_dump(exclude_none=True))
         self.session.add(new_task)
         await self.session.commit()

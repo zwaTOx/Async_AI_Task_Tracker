@@ -7,7 +7,7 @@ from src.task.dependencies import verify_update_task_perms
 from src.user.dependencies import CurrentUser
 from src.user_project_association.dependencies import verify_project_member, verify_create_task_perms
 from .service import TaskService
-from .schemas import TaskCreate, TaskPagination, TaskResponse, TaskUpdate
+from .schemas import TaskCreate, TaskPagination, TaskResponse, TaskResponseWithSubtasks, TaskUpdate
 
 task_router = APIRouter()
 
@@ -44,6 +44,20 @@ async def get_all_tasks_by_date(
         end_date=end_date
     )
     return {"items" :tasks}
+
+@task_router.get(
+    "/{project_id}/tasks/{task_id}",
+    response_model=TaskResponseWithSubtasks,
+    dependencies=[Depends(verify_project_member)]
+)
+async def get_task(
+    session: DbSession,
+    user: CurrentUser,
+    project_id: int,
+    task_id: int
+):
+    task =  await TaskService(session).get_task_by_id(project_id, task_id)
+    return task
 
 @task_router.post(
     "/{project_id}/tasks",
