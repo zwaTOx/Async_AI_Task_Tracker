@@ -36,7 +36,7 @@ async def ping():
     return {'msg': 'pong'}
 
 app.include_router(
-    user_router, prefix='/api/users', tags=['User']
+    user_router, prefix='/api', tags=['User']
 )
 app.include_router(
     code_router, prefix="/api/restore", tags=["Codes"]
