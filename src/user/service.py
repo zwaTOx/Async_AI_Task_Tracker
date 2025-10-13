@@ -4,7 +4,7 @@ from src.exceptions import ConflictException, InvalidPasswordException, AuthExce
 from src.code.utils import decode_reset_password_token
 from .schemes import UserCreate, UserResponse, UserLogin, ResetPasswordData, UserUpdateData
 from .repository import UserRepository
-from .utils import verify_password, generate_auth_token
+from .utils import verify_password, generate_auth_token, generate_username
 
 class UserService:
     def __init__(self, session: AsyncSession):
@@ -20,6 +20,13 @@ class UserService:
         )
         if founded_user is not None:
             raise ConflictException("User is already exists")
+        if user_create_data.username is None:
+            username = await generate_username(user_create_data.email)
+            user_create_data.username = username
+        elif user_create_data.username is not None:
+            user_with_same_username = await UserRepository(self.session).get_user_by_username(user_create_data.username)
+            if user_with_same_username is not None:
+                raise ConflictException("Пользователь с таким username уже существует")
         new_user = await UserRepository(self.session).create_user(user_create_data)
         return new_user
     
@@ -38,6 +45,10 @@ class UserService:
             attach = await AttachmentRepository(self.session).get_attachment_by_id(user_update_data.icon_id)
             if attach is None:
                 raise NotFoundException("Вложение не найдено")
+        if user_update_data.username is not None:
+            user_with_same_username = await UserRepository(self.session).get_user_by_username(user_update_data.username)
+            if user_with_same_username is not None:
+                raise ConflictException("Пользователь с таким username уже существует")
         upd_user = await UserRepository(self.session).update_user_info(user_id, user_update_data)
         return upd_user
 

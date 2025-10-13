@@ -18,6 +18,11 @@ class UserRepository:
         result = await self.session.exec(statement)
         return result.first()
     
+    async def get_user_by_username(self, username: str):
+        statement = select(User).filter(User.username == username)
+        result = await self.session.exec(statement)
+        return result.first()
+
     async def create_user(self, user_data: UserCreate):
         hashed_password = hash_password(user_data.password) 
         data_dict = user_data.model_dump(exclude={'password', 'verify_password'})
