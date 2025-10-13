@@ -10,11 +10,15 @@ def validate_username_starts(value: Optional[str]) -> Optional[str]:
         raise ValueError('Имя пользователя должно начинаться с @')
     return value
 
-USERNAME_FIELD = Field(None, min_length=5, max_length=50, description="Имя пользователя должно начинаться с '@'")
+USERNAME_FIELD = Field(None, min_length=5, max_length=50, description="Имя пользователя должно начинаться с '@'", title='username')
 BIO_FIELD = Field(None, max_length=300)
 NICKNAME_FIELD = Field(None, max_length=50)
 
 UsernameType = Annotated[Optional[str], AfterValidator(validate_username_starts), USERNAME_FIELD]
+
+class TokenResponse(CustomBase):
+    access_token: str
+    user_id: int
 
 class UserResponse(CustomBase):
     id: int

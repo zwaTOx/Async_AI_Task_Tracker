@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, Response, status
 
 from src.database import DbSession
-from .schemes import UserLogin, UserResponse, UserCreate, ResetPasswordData, UserUpdateData
+from .schemes import UserLogin, UserResponse, UserCreate, ResetPasswordData, UserUpdateData, TokenResponse
 from .service import UserService
 from .dependencies import CurrentUser
 
 user_router = APIRouter()
 
 @user_router.post(
-    "/register",
+    "/auth/sign-up",
     response_model=UserResponse,
 )
 async def create_user(
@@ -20,8 +20,9 @@ async def create_user(
     return new_user
 
 @user_router.post(
-    "",
-    status_code=status.HTTP_201_CREATED
+    "/auth/sign-in",
+    status_code=status.HTTP_201_CREATED,
+    response_model=TokenResponse,
 )
 async def auth_user(
     session: DbSession,
@@ -41,30 +42,8 @@ async def auth_user(
         "user_id": user_id
     }
 
-@user_router.get(
-    "/me",
-    response_model=UserResponse
-)
-async def get_my_profile(
-    session: DbSession,
-    user: CurrentUser
-):
-    return user
-
-@user_router.patch(
-    "/me",
-    response_model=UserResponse,
-)
-async def update_user(
-    session: DbSession,
-    user: CurrentUser,
-    user_update_data: UserUpdateData
-):
-    upd_user = await UserService(session).update_user(user.id, user_update_data)
-    return upd_user
-
 @user_router.put(
-    "/reset-password",
+    "/auth/reset-password",
 )
 async def reset_password(
     session: DbSession,
@@ -75,3 +54,25 @@ async def reset_password(
     return {
         "message": "Пароль успешно обновлен"
     }
+
+@user_router.get(
+    "/users/me",
+    response_model=UserResponse
+)
+async def get_my_profile(
+    session: DbSession,
+    user: CurrentUser
+):
+    return user
+
+@user_router.patch(
+    "/users/me",
+    response_model=UserResponse,
+)
+async def update_user(
+    session: DbSession,
+    user: CurrentUser,
+    user_update_data: UserUpdateData
+):
+    upd_user = await UserService(session).update_user(user.id, user_update_data)
+    return upd_user
