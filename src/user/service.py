@@ -19,7 +19,7 @@ class UserService:
             user_create_data.email
         )
         if founded_user is not None:
-            raise ConflictException("User is already exists")
+            raise ConflictException("Пользователь с таким email уже существует")
         if user_create_data.username is None:
             username = await generate_username(user_create_data.email)
             user_create_data.username = username
@@ -31,9 +31,14 @@ class UserService:
         return new_user
     
     async def auth_user(self, user_auth_data: UserLogin):
-        founded_user = await UserRepository(self.session).get_user_by_email(
-            user_auth_data.email
-        )
+        if user_auth_data.login.startswith('@'):
+            founded_user = await UserRepository(self.session).get_user_by_username(
+                user_auth_data.login
+            )
+        else:
+            founded_user = await UserRepository(self.session).get_user_by_email(
+                user_auth_data.login
+            )
         if founded_user is None:
             raise AuthException
         if not verify_password(user_auth_data.password, founded_user.hashed_password):

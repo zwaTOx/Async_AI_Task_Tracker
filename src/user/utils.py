@@ -5,7 +5,7 @@ from jose import jwt
 async def generate_username(email: str) -> str:
     base_username = email.split('@')[0]
     timestamp = int(datetime.now().timestamp())
-    return f"{base_username}_{timestamp}"
+    return f"@{base_username}_{timestamp}"
 
 def hash_password(password: str) -> str:
     #Обязательно сделать хеширование в проде

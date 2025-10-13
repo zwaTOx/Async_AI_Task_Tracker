@@ -9,7 +9,7 @@ class ConflictException(TaskTrackerHTTPException):
         super().__init__(status_code=status.HTTP_409_CONFLICT, detail=detail)
 
 class InvalidPasswordException(TaskTrackerHTTPException):
-    def __init__(self, detail="Password mismatch error"):
+    def __init__(self, detail="Пароли не совпадают"):
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
 
 class BadRequestException(TaskTrackerHTTPException):
