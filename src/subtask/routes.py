@@ -7,7 +7,7 @@ from src.database import DbSession
 from .service import SubtaskService
 from .schemas import SubtaskResponse, SubtaskPargination, SubtaskCreate, SubtaskUpdate
 
-subtask_router = APIRouter( tags=["Subtasks"])
+subtask_router = APIRouter()
 
 @subtask_router.get(
     "/projects/{project_id}/tasks/{task_id}/subtasks",
