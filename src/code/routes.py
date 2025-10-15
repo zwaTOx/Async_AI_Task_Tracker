@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status
 
 from src.database import DbSession
+from src.user.dependencies import CurrentUser
 from .service import CodeService
 
 code_router = APIRouter()

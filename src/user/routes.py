@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Response, status
 
 from src.database import DbSession
-from .schemes import UserLogin, UserResponse, UserCreate, ResetPasswordData, UserUpdateData, TokenResponse
+from .schemes import UserLogin, UserResponse, UserCreate, UserUpdateData, TokenResponse, ResetPasswordData, UpdatePasswordData
 from .service import UserService
 from .dependencies import CurrentUser
 
@@ -76,3 +76,14 @@ async def update_user(
 ):
     upd_user = await UserService(session).update_user(user.id, user_update_data)
     return upd_user
+
+@user_router.put(
+    "/users/me/update-password"
+)
+async def update_password(
+    session: DbSession,
+    user: CurrentUser,
+    upd_data: UpdatePasswordData
+):
+    await UserService(session).update_password(user.id, upd_data)
+    return {"message": "Пароль успешно изменен"}

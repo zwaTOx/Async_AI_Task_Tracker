@@ -2,7 +2,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.attachment.repository import AttachmentRepository
 from src.exceptions import ConflictException, InvalidPasswordException, AuthException, BadRequestException, NotFoundException
 from src.code.utils import decode_reset_password_token
-from .schemes import UserCreate, UserResponse, UserLogin, ResetPasswordData, UserUpdateData
+from .schemes import UserCreate, UserResponse, UserLogin, UpdatePasswordData, UserUpdateData, ResetPasswordData
 from .repository import UserRepository
 from .utils import verify_password, generate_auth_token, generate_username
 
@@ -57,11 +57,18 @@ class UserService:
         upd_user = await UserRepository(self.session).update_user_info(user_id, user_update_data)
         return upd_user
 
+    async def update_password(self, user_id: int, upd_data: UpdatePasswordData):
+        user = await UserRepository(self.session).get_by_id(user_id)
+        if not verify_password(user.hashed_password, upd_data.old_password):
+            raise BadRequestException("Неверный пароль")
+        if upd_data.new_password == upd_data.old_password:
+            raise BadRequestException("Нельзя изменить пароль на старный пароль")
+        await UserRepository(self.session).update_password(user_id, upd_data.new_password)
+
     async def reset_password(self, token: str, password_update_data: ResetPasswordData):
         user_id = decode_reset_password_token(token)
         user = await UserRepository(self.session).get_by_id(user_id)
         if verify_password(password_update_data.password, user.hashed_password):
             raise BadRequestException("Нельзя изменить пароль на старный пароль")
-        await UserRepository(self.session).update_password(user_id, password_update_data)
-        
+        await UserRepository(self.session).update_password(user_id, password_update_data.password)
         

@@ -18,7 +18,7 @@ class CodeService:
             raise BadRequestException("Пользователя с таким email не существует")
         code = generate_code()
         asyncio.create_task(send_recovery_code(email, code))
-        await CodeRepository(self.session).create_restore_code(founded_user.id, code)
+        await CodeRepository(self.session).create_code(founded_user.id, code)
         return code, founded_user.id
     
     async def get_token_from_code(self, user_id: int, code: str):

@@ -46,3 +46,7 @@ class UserUpdateData(CustomBase):
 
 class ResetPasswordData(CustomBase):
     password: str
+
+class UpdatePasswordData(CustomBase):
+    old_password: str
+    new_password: str

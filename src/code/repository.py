@@ -8,14 +8,14 @@ class CodeRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_restore_code(self, user_id: int, code: str) -> str:
-        new_user = Code(
+    async def create_code(self, user_id: int, code: str) -> int:
+        new_code = Code(
             code=code,
             user_id=user_id
         )
-        self.session.add(new_user)
+        self.session.add(new_code)
         await self.session.commit()
-        return code
+        return new_code.id
     
     async def get_code(self, user_id: int, code: int, code_type: str = "Restore"):
         statement = select(Code).filter(
