@@ -21,6 +21,7 @@ class ProjectResponse(CustomBase):
     owner_id: int
     name: str
     description: str
+    icon_id: int|None
     
 class ProjectPagination(CustomBase):
     items: list[ProjectResponse]

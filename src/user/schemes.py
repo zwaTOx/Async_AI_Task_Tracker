@@ -22,14 +22,14 @@ class TokenResponse(CustomBase):
 
 class UserResponse(CustomBase):
     id: int
-    email: str
+    email: EmailStr
     username: UsernameType = USERNAME_FIELD
     nickname: Optional[str] = NICKNAME_FIELD
     bio: str = BIO_FIELD
     icon_id: int | None
 
 class UserCreate(CustomBase):
-    email: str
+    email: EmailStr
     username: Optional[UsernameType] = USERNAME_FIELD
     password: str
     verify_password: str
