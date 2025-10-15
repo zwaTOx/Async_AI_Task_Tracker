@@ -40,7 +40,7 @@ async def create_subtask(
     return new_subtask
 
 @subtask_router.patch(
-    "projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}",
+    "/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}",
     dependencies=[Depends(verify_project_member), Depends(verify_update_task_perms)],
     response_model=SubtaskResponse
 )
@@ -56,7 +56,7 @@ async def update_subtask(
     return upd_subtask
 
 @subtask_router.delete(
-    "projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}",
+    "/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}",
     dependencies=[Depends(verify_project_member), Depends(verify_update_task_perms)],
     status_code=status.HTTP_204_NO_CONTENT
 )
