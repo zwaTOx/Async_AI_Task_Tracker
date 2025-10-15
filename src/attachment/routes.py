@@ -38,7 +38,7 @@ async def get_user_icon(
     return FileResponse(file_path)
 
 @attach_router.get(
-    "projects/{project_id}/icon",
+    "/projects/{project_id}/icon",
     dependencies=[Depends(verify_project_member)]
 )
 async def get_project_icon(
