@@ -1,11 +1,13 @@
 from datetime import timedelta, datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, Query, status
+import asyncio
 
 from src.database import DbSession
 from src.task.dependencies import verify_update_task_perms
 from src.user.dependencies import CurrentUser
 from src.user_project_association.dependencies import verify_project_member, verify_create_task_perms
+from src.notification.service import send_notification_to_user
 from .service import TaskService
 from .schemas import TaskCreate, TaskPagination, TaskResponse, TaskResponseWithSubtasks, TaskUpdate
 
@@ -57,6 +59,7 @@ async def get_task(
     task_id: int
 ):
     task =  await TaskService(session).get_task_by_id(project_id, task_id)
+    asyncio.create_task(send_notification_to_user(user.id, {"event": "task_viewed", "task_id": task_id}))
     return task
 
 @task_router.post(
