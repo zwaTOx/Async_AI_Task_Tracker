@@ -1,5 +1,5 @@
 from typing import Dict, List
-import asyncio
+import logging
 from fastapi import WebSocket
 
 active_connections: Dict[int, List[WebSocket]] = {}
@@ -9,14 +9,14 @@ async def send_notification_to_user(user_id: int, payload: dict) -> int:
     """Send a JSON payload to all active websocket connections for a user.
     Returns number of successful sends.
     """
-    print('Начинаю отправку уведомления пользователю', user_id, 'с полезной нагрузкой:', payload)
+    logging.info('Начинаю отправку уведомления пользователю: %d с полезной нагрузкой: %s', user_id, payload)
     sent = 0
     conns = active_connections.get(user_id, []).copy()
     for ws in conns:
         try:
             await ws.send_json(payload)
             sent += 1
-            print("Отправил уведомление: пользователю:", user_id)
+            logging.info("Отправил уведомление: пользователю: %d", user_id)
         except Exception:
             try:
                 await ws.close()
