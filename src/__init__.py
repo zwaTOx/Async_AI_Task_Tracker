@@ -10,6 +10,7 @@ from src.code.routes import code_router
 from src.attachment.routes import attach_router
 from src.task.routes import task_router
 from src.subtask.routes import subtask_router
+from src.theme.routes import theme_router
 from src.notification.routes import notification_router
 
 @asynccontextmanager
@@ -62,5 +63,8 @@ app.include_router(
     subtask_router, prefix="/api", tags=["Subtask"]
 )
 app.include_router(
-    notification_router, prefix="/api/notifications", tags=["Notification"]
+    theme_router, prefix="/api/themes", tags=['Theme']
+)
+app.include_router(
+    notification_router, prefix="", tags=["Notification"]
 )
