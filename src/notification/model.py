@@ -8,3 +8,4 @@ class Notification(Base, TimeStampMixin):
     id: Mapped[int_pk]
     user_id: Mapped[int] = mapped_column(index=True, nullable=False)
     message: Mapped[str] = mapped_column(nullable=False)
+    link: Mapped[str] = mapped_column(nullable=True)
