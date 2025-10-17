@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     RESET_CODE_SECRET_ALG: str
 
     DEFAULT_PROJECT_ROLE: str = 'USER'
+    
+    NOTIF_DEFAULT_LIMIT: int = 10
 
     model_config = SettingsConfigDict(
         env_file=".env",
