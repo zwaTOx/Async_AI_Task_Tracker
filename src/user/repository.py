@@ -26,7 +26,7 @@ class UserRepository:
     async def create_user(self, user_data: UserCreate):
         hashed_password = hash_password(user_data.password) 
         data_dict = user_data.model_dump(exclude={'password', 'verify_password'})
-        new_user = User(hashed_password=hashed_password, **data_dict)
+        new_user = User(hashed_password=hashed_password, nickname=user_data.username[1:], **data_dict)
         self.session.add(new_user)
         await self.session.commit()
         return new_user
