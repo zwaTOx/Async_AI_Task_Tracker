@@ -60,6 +60,11 @@ class TaskService:
     
     async def update_task(self,
             user_id: int, project_id: int, task_id: int, task_update: TaskUpdate):
+        task = await TaskRepository(self.session).get_task(task_id)
+        if task.performer_id == user_id:
+            update_data = task_update.model_dump(exclude_unset=True)
+            if update_data and set(update_data.keys()) != {'status'}:
+                raise BadRequestException("Исполнителю разрешено обновлять только поле status")
         if task_update.performer_id is not None and task_update.performer_id!=0:
             performer = await UserProjectAssociationRepository(self.session).get_membership(task_update.performer_id, project_id)
             if performer is None:

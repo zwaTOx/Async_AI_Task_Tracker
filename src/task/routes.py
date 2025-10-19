@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query, status
 import asyncio
 
 from src.database import DbSession
-from src.task.dependencies import verify_update_task_perms
+from src.task.dependencies import verify_update_task_perms, verify_delete_task_perms
 from src.user.dependencies import CurrentUser
 from src.user_project_association.dependencies import verify_project_member, verify_create_task_perms
 from src.notification.service import send_notification_to_user
@@ -95,7 +95,7 @@ async def update_task(
 @task_router.delete(
     "/{project_id}/tasks/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(verify_project_member), Depends(verify_update_task_perms)]
+    dependencies=[Depends(verify_project_member), Depends(verify_delete_task_perms)]
 )
 async def delete_task(
     session: DbSession,
