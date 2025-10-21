@@ -6,22 +6,45 @@ from sqlalchemy import select, desc
 
 from src.repository import SQLAlchemyRepository
 from src.config import settings
-from .schemes import ProjectNotificationCreate
+from .schemes import ProjectNotificationCreate, NotificationResponse
 from .model import Notification
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
+        self.active_connections: dict[int, WebSocket] = {}
     
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+    async def connect(self, websocket: WebSocket, user_id: int):
+        if user_id in self.active_connections:
+            existing_connection = self.active_connections[user_id]
+            try:
+                await existing_connection.close()
+            except Exception as e:
+                pass
+            finally:
+                del self.active_connections[user_id]
+        await websocket.accept()
+        self.active_connections[user_id] = websocket
+    
+    def disconnect(self, websocket: WebSocket, user_id: int):
+        if user_id in self.active_connections:
+            del self.active_connections[user_id]
 
-    async def send_personal_message(self, payload: dict, websocket: WebSocket):
-        await websocket.send_text(json.dumps(payload))
+    async def send_personal_message(self, user_id: int, payload: dict):
+        if user_id in self.active_connections:
+            await self.active_connections[user_id].send_json(payload)
+
+    async def broadcast_to_all(self, message: dict):
+        disconnected_users = []
+        
+        for user_id, connection in self.active_connections.items():
+            try:
+                await connection.send_text(json.dumps(message))
+            except Exception:
+                disconnected_users.append(user_id)
+        
+        for user_id in disconnected_users:
+            if user_id in self.active_connections:
+                del self.active_connections[user_id]
 
 manager = ConnectionManager()
 
@@ -33,7 +56,10 @@ class NotificationRepository(SQLAlchemyRepository):
         result = await self.session.execute(statement)
         return result.scalars().all()
     
-    async def create_notifications(self, users_ids: List[int], notif_data: ProjectNotificationCreate):
+    async def create_notifications(self, 
+        users_ids: List[int], 
+        notif_data: ProjectNotificationCreate
+    ) -> List[NotificationResponse]:
         notifications = []
         for user_id in users_ids:
             notifications.append(

@@ -1,9 +1,13 @@
-from fastapi import WebSocket, APIRouter, Depends, WebSocketDisconnect, HTTPException, status
+import asyncio
+import json
+from fastapi import BackgroundTasks, WebSocket, APIRouter, Depends, WebSocketDisconnect
+from fastapi.encoders import jsonable_encoder
 
 from src.database import DbSession
 from .schemes import NotificationPargination, NotificationCreate, NotificationResponse, ProjectNotificationCreate
 from .service import NotificationService
-from .repository import manager, ConnectionManager
+from .repository import manager
+from .dependencies import WSCurrentUser
 from src.user.dependencies import CurrentUser  
 from src.user_project_association.dependencies import verify_project_member
 from src.config import settings 
@@ -30,25 +34,30 @@ async def get_notifications(
     response_model=NotificationResponse
 )
 async def create_notification(
+    background_tasks: BackgroundTasks,
     session: DbSession,
     user: CurrentUser,
     notif_data: NotificationCreate
 ):
     new_notif = await NotificationService(session).create_notification(notif_data)
+    background_tasks.add_task(manager.send_personal_message, user.id, {
+        "type": "notification_created",
+        "notification": new_notif.model_dump(mode='json')
+    })
     return new_notif
 
-@notification_router.websocket("/ws/{user_id}")
-async def notifications_ws(websocket: WebSocket, user_id: int):
-    """
-    WebSocket endpoint for user notifications.
-    Connects the socket to the ConnectionManager and keeps the connection alive.
-    """
-    await manager.connect(websocket)
+@notification_router.websocket("/ws/connect/")
+async def connect_to_ws(
+    websocket: WebSocket, 
+    session :DbSession,
+    user: WSCurrentUser
+):
+    await manager.connect(websocket, user.id)
     try:
-        await manager.send_personal_message({"type": "welcome", "user_id": user_id}, websocket)
+        await manager.send_personal_message(user.id, {"type": "welcome", "user_id": user.id})
         while True:
-            data = await websocket.receive_text()
-            await manager.send_personal_message({"type": "echo", "payload": data}, websocket)
+            data = await websocket.receive_json()
+            await manager.send_personal_message(user.id, {"type": "echo", "payload": data})
 
     except WebSocketDisconnect:
         manager.disconnect(websocket)
@@ -58,18 +67,16 @@ async def notifications_ws(websocket: WebSocket, user_id: int):
     dependencies=[Depends(verify_project_member)]
 )
 async def create_project_notification(
+    background_tasks: BackgroundTasks,
     session: DbSession,
     user: CurrentUser,
     project_id: int,
     notif_data: ProjectNotificationCreate
 ):
     notifications = await NotificationService(session).create_project_notification(user.id, project_id, notif_data)
-    try:
-        await manager.send_personal_message(user.id, {
+    background_tasks.add_task(manager.broadcast_to_all, {
             "type": "project_notifications",
             "project_id": project_id,
-            "notifications": notifications
+            "notifications": jsonable_encoder(notifications) 
         })
-    except Exception:
-        pass
     return {"notifications": notifications}
