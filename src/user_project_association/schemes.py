@@ -7,8 +7,8 @@ from .utils import Roles, Inv_Roles, Update_Roles
 from src.config import settings
 
 class InviteModel(CustomBase):
-    email: str = Query(...)
-    role: Inv_Roles = Query(default=settings.DEFAULT_PROJECT_ROLE)
+    email: str 
+    role: Inv_Roles = Field(default=settings.DEFAULT_PROJECT_ROLE)
 
 class InviteProjectData(CustomBase):
     user_id: int
