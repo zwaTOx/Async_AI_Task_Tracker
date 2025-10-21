@@ -34,7 +34,7 @@ async def invite_user(
     user: CurrentUser,
     request: Request,
     project_id: int,
-    inv_data: InviteModel = Query(...)
+    inv_data: InviteModel 
 ):
     await ProjectAssociationService(session).invite_member_by_email(
         user, project_id, inv_data.email, inv_data.role
