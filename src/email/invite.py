@@ -56,7 +56,7 @@ async def send_project_invite(
             port=smtp_port,
             username=SENDER_EMAIL,
             password=SENDER_EMAIL_PASSWORD,
-            use_tls=True,
+            use_tls=False,
             start_tls=True,  
         )
         print(f"Приглашение в проект отправлено на {recipient_email}")
