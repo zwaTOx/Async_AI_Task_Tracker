@@ -4,6 +4,15 @@ from src.user.dependencies import CurrentUser
 from src.user_project_association.service import ProjectAssociationService
 from src.task.repository import TaskRepository
 
+async def verify_task_exists(
+    session: DbSession,
+    task_id: int,
+    project_id: int   
+):
+    is_task_exist = await TaskRepository(session).get(task_id)
+    if not is_task_exist:
+        raise NotFoundException("Задача не найдена")
+
 async def verify_task_perms_base(
     session: DbSession,
     user_id: int,

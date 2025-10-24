@@ -56,7 +56,7 @@ class TaskService:
         if task_create.start and task_create.end:
             if task_create.start > task_create.end:
                 raise BadRequestException("Дата начала не может быть позже даты окончания")
-        new_task = await TaskRepository(self.session).create_task(user_id, project_id, task_create)
+        new_task = await TaskRepository(self.session).create(task_create, creator_id=user_id, project_id=project_id)
         return new_task
     
     async def update_task(self,
@@ -82,4 +82,4 @@ class TaskService:
         return upd_task
         
     async def delete_task(self, user_id: int, project_id: int, task_id: int):
-        await TaskRepository(self.session).delete_task(task_id)
+        await TaskRepository(self.session).delete(task_id)

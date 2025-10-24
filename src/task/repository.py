@@ -4,14 +4,14 @@ from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import selectinload
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from src.repository import SQLAlchemyRepository
 from src.exceptions import PermissionException
 from src.tag.model import Tag
 from .models import Task
 from .schemas import TaskCreate, TaskResponse, TaskUpdate, TaskResponseWithSubtasks
 
-class TaskRepository:
-    def __init__(self, session: AsyncSession):
-        self.session = session
+class TaskRepository(SQLAlchemyRepository):
+    model = Task
 
     async def get_tasks(self, project_id: int) -> List[TaskResponse]:
         statement = select(Task).filter(Task.project_id == project_id)
@@ -62,12 +62,6 @@ class TaskRepository:
         statement = select(Task).where(Task.id == task_id).options(selectinload(Task.subtasks)).options(selectinload(Task.tags))
         result = await self.session.exec(statement)
         return result.scalars().first()
-
-    async def create_task(self, user_id: int, project_id: int, task_data: TaskCreate) -> TaskResponse:
-        new_task = Task(creator_id=user_id, project_id=project_id, **task_data.model_dump(exclude_none=True))
-        self.session.add(new_task)
-        await self.session.commit()
-        return new_task
     
     async def _update_task_tags(self, task, tags: list[int]):
         stmt = select(Tag).where(Tag.id.in_(tags))
@@ -89,8 +83,3 @@ class TaskRepository:
         await self.session.commit()
         await self.session.refresh(task)
         return task
-    
-    async def delete_task(self, task_id: int):
-        task = await self.get_task(task_id)
-        await self.session.delete(task)
-        await self.session.commit()
