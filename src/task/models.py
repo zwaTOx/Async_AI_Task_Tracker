@@ -13,6 +13,7 @@ class Task(Base, TimeStampMixin):
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     color: Mapped[str] = mapped_column(String(30), nullable=False)
     status: Mapped[Literal["Назначена", "В работе", "Выполенена"]] = mapped_column(default="Назначена")
+    priority: Mapped[Literal["Низкий", "Средний", "Высокий", "Критический"]] = mapped_column(None, nullable=True)
     start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
 

@@ -12,6 +12,7 @@ class TaskBase(CustomBase):
     description: Optional[str] = None
     color: str
     status: str
+    priority: Optional[str] = None
     start: Optional[datetime] = None
     end: Optional[datetime] = None
     creator_id: int
@@ -22,6 +23,7 @@ class TaskCreate(CustomBase):
     title: str
     description: Optional[str]
     color: str
+    priority: Optional[Literal["Низкий", "Средний", "Высокий", "Критический"]] = Field(default=None)
     status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(default="Назначена")
     start: Optional[datetime] = Field(default=None)
     end: Optional[datetime] = Field(default=None)
@@ -41,6 +43,7 @@ class TaskUpdate(CustomBase):
     title: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
     color: Optional[str] = Field(default=None)
+    priority: Optional[Literal["Низкий", "Средний", "Высокий", "Критический"]] = Field(default=None)
     status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(default=None)
     tags: Optional[list[int]] = Field(default=None)
     
