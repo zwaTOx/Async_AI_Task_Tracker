@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 
 from src.models import TimeStampMixin
+from src.tag.model import tag_task
 from src.database import Base, int_pk
 
 class Task(Base, TimeStampMixin):
@@ -20,7 +21,7 @@ class Task(Base, TimeStampMixin):
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
 
     subtasks = relationship('Subtask', backref='task', cascade="all, delete-orphan")
-    #tags
+    tags = relationship('Tag', secondary=tag_task, back_populates="tasks")
     #file_id
 
     

@@ -3,7 +3,8 @@ from typing import Literal, Optional
 
 from pydantic import Field
 from src.schemas import CustomBase, TimeStampSchema
-from src.subtask.schemas import SubtaskResponse 
+from src.subtask.schemas import SubtaskResponse
+from src.tag.schemes import TagResponse 
 
 class TaskBase(CustomBase):
     id: int
@@ -31,6 +32,7 @@ class TaskResponse(TimeStampSchema, TaskBase):
 
 class TaskResponseWithSubtasks(TaskResponse):
     subtasks: list[SubtaskResponse]
+    tags: list[TagResponse]
 
 class TaskPagination(CustomBase):
     items: list[TaskResponse]
@@ -40,5 +42,6 @@ class TaskUpdate(CustomBase):
     description: Optional[str] = Field(default=None)
     color: Optional[str] = Field(default=None)
     status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(default=None)
+    tags: Optional[list[int]] = Field(default=None)
     
     performer_id: Optional[int] = Field(default=None, description="ID исполнителя. Если передать 0, исполнитель будет сброшен")

@@ -4,6 +4,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.exceptions import BadRequestException, PermissionException
 from .schemas import TaskCreate, TaskResponse, TaskResponseWithSubtasks, TaskUpdate
 from src.user_project_association.repository import UserProjectAssociationRepository
+from src.tag.repository import TagRepository
 from src.project.repository import ProjectRepository
 from .repository import TaskRepository
 
@@ -69,6 +70,14 @@ class TaskService:
             performer = await UserProjectAssociationRepository(self.session).get_membership(task_update.performer_id, project_id)
             if performer is None:
                 raise BadRequestException("Исполнитель не является участником проекта")
+        if task_update.tags is not None:
+            existing_tags = await TagRepository(self.session).get_all(project_id=project_id)
+            existing_tag_ids = {tag.id for tag in existing_tags}
+            non_existing_tag_ids = set(task_update.tags) - existing_tag_ids
+            if non_existing_tag_ids:
+                raise BadRequestException(
+                    f"Теги с ID {list(non_existing_tag_ids)} не существуют"
+                )
         upd_task = await TaskRepository(self.session).update_task(task_id, task_update)
         return upd_task
         

@@ -5,6 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.exceptions import PermissionException
+from src.tag.model import Tag
 from .models import Task
 from .schemas import TaskCreate, TaskResponse, TaskUpdate, TaskResponseWithSubtasks
 
@@ -53,12 +54,12 @@ class TaskRepository:
         return result.scalars().all()
     
     async def get_task(self, task_id: int):
-        statement = select(Task).filter(Task.id==task_id)
+        statement = select(Task).filter(Task.id==task_id).options(selectinload(Task.tags))
         result = await self.session.exec(statement)
-        return result.scalars().first()
+        return result.scalar_one_or_none()
 
     async def get_task_with_subtasks(self, task_id: int) -> TaskResponseWithSubtasks:
-        statement = select(Task).where(Task.id == task_id).options(selectinload(Task.subtasks))
+        statement = select(Task).where(Task.id == task_id).options(selectinload(Task.subtasks)).options(selectinload(Task.tags))
         result = await self.session.exec(statement)
         return result.scalars().first()
 
@@ -68,16 +69,25 @@ class TaskRepository:
         await self.session.commit()
         return new_task
     
+    async def _update_task_tags(self, task, tags: list[int]):
+        stmt = select(Tag).where(Tag.id.in_(tags))
+        result = await self.session.exec(stmt)
+        new_tags = result.scalars().all()
+        task.tags = new_tags
+
     async def update_task(self, task_id: int, task_update: TaskUpdate) -> TaskResponse:
         task = await self.get_task(task_id)
         if task is None:
             raise PermissionException
-        update_data = task_update.model_dump(exclude_none=True)
+        update_data = task_update.model_dump(exclude_none=True, exclude='tags')
         if task_update.performer_id == 0:
             update_data["performer_id"] = None
         for key, value in update_data.items():
             setattr(task, key, value)
+        if task_update.tags is not None:
+            await self._update_task_tags(task, task_update.tags)
         await self.session.commit()
+        await self.session.refresh(task)
         return task
     
     async def delete_task(self, task_id: int):
