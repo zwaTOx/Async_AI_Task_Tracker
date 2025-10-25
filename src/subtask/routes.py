@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 
-from src.task.dependencies import verify_update_task_perms
-from src.user_project_association.dependencies import verify_project_member
+from src.task.dependencies import verify_task_action
+from src.user_project_association.access_config import Action
 from src.user.dependencies import CurrentUser
 from src.database import DbSession
 from .service import SubtaskService
@@ -11,7 +11,9 @@ subtask_router = APIRouter()
 
 @subtask_router.get(
     "/projects/{project_id}/tasks/{task_id}/subtasks",
-    dependencies=[Depends(verify_project_member)],
+    dependencies=[
+        Depends(verify_task_action(action=Action.VIEW))
+    ],
     response_model=SubtaskPargination
 )
 async def get_task_subtasks(
@@ -25,7 +27,9 @@ async def get_task_subtasks(
 
 @subtask_router.post(
     "/projects/{project_id}/tasks/{task_id}/subtasks",
-    dependencies=[Depends(verify_project_member), Depends(verify_update_task_perms)],
+    dependencies=[
+        Depends(verify_task_action(action=Action.EDIT))
+    ],
     status_code=status.HTTP_201_CREATED,
     response_model=SubtaskResponse
 )
@@ -41,7 +45,9 @@ async def create_subtask(
 
 @subtask_router.patch(
     "/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}",
-    dependencies=[Depends(verify_project_member), Depends(verify_update_task_perms)],
+    dependencies=[
+        Depends(verify_task_action(action=Action.EDIT))
+    ],
     response_model=SubtaskResponse
 )
 async def update_subtask(
@@ -57,7 +63,9 @@ async def update_subtask(
 
 @subtask_router.delete(
     "/projects/{project_id}/tasks/{task_id}/subtasks/{subtask_id}",
-    dependencies=[Depends(verify_project_member), Depends(verify_update_task_perms)],
+    dependencies=[
+        Depends(verify_task_action(action=Action.EDIT))
+    ],
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_subtask(
