@@ -23,6 +23,7 @@ class Task(Base, TimeStampMixin):
 
     subtasks = relationship('Subtask', backref='task', cascade="all, delete-orphan")
     tags = relationship('Tag', secondary=tag_task, back_populates="tasks")
+    comments = relationship('Comment', backref='task', cascade="all, delete-orphan")
     #file_id
 
     

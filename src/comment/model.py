@@ -1,5 +1,5 @@
 from src.database import Base, int_pk
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 
 class Comment(Base):
@@ -9,3 +9,5 @@ class Comment(Base):
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     task_id: Mapped[int] = mapped_column(ForeignKey('tasks.id'))
     parent_comment_id: Mapped[int] = mapped_column(ForeignKey("comments.id"), nullable=True)
+
+    # task: Mapped["Task"] = relationship("Task", back_populates="comments")

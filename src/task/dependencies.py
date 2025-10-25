@@ -1,8 +1,35 @@
 from src.database import DbSession
 from src.exceptions import PermissionException, NotFoundException
 from src.user.dependencies import CurrentUser
+from src.user_project_association.access_config import Action, ResourceType
+from src.user_project_association.dependencies import verify_project_action
 from src.user_project_association.service import ProjectAssociationService
 from src.task.repository import TaskRepository
+
+def verify_task_action(action: Action):
+    async def dependency(
+        session: DbSession,
+        user: CurrentUser,
+        project_id: int,
+        task_id: int
+    ):
+        await verify_project_action(
+            session=session,
+            user=user,
+            project_id=project_id,
+            action=action,
+            resource_type=ResourceType.TASK
+        )
+        task = await TaskRepository(session).get_task(task_id)
+        if not task or task.project_id != project_id: 
+            raise NotFoundException('Задача не найдена в прокте')
+        if action == Action.DELETE:
+            if task.creator_id != user.id:
+                raise PermissionException(f"Недостаточно прав для выполнения действия")
+        if action == Action.EDIT:
+            if task.performer_id != user.id or task.creator_id != user.id:
+                raise PermissionException(f"Недостаточно прав для выполнения действия")
+    return dependency
 
 async def verify_task_exists(
     session: DbSession,
