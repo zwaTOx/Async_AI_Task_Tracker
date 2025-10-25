@@ -5,6 +5,8 @@ from src.user.dependencies import CurrentUser
 from .schemes import ProjectCreate, ProjectResponse, ProjectPagination, ProjectUpdate
 from .repository import ProjectRepository
 from .service import ProjectService
+from src.user_project_association.dependencies import Action
+from .dependency import verify_project_action
 from src.user_project_association.dependencies import verify_project_admin
 
 project_router = APIRouter()
@@ -38,7 +40,9 @@ async def create_project(
 
 @project_router.patch(
     "/{project_id}",
-    dependencies=[Depends(verify_project_admin)]
+    dependencies=[
+        Depends(verify_project_action(Action.EDIT))
+    ]
 )
 async def update_project(
     session: DbSession,
@@ -53,7 +57,10 @@ async def update_project(
 
 @project_router.delete(
     "/{project_id}",
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[
+        Depends(verify_project_action(Action.DELETE))
+    ]
 )
 async def delete_project(
     session: DbSession,

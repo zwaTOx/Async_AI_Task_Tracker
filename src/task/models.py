@@ -19,9 +19,9 @@ class Task(Base, TimeStampMixin):
 
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     performer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
-    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
 
-    subtasks = relationship('Subtask', backref='task', cascade="all, delete-orphan")
+    subtasks = relationship('Subtask', backref='parent_task', cascade="all, delete-orphan")
     tags = relationship('Tag', secondary=tag_task, back_populates="tasks")
     comments = relationship('Comment', backref='task', cascade="all, delete-orphan")
     #file_id

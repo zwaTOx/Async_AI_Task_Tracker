@@ -3,12 +3,12 @@ from src.schemas import CustomBase
 
 class SubtaskCreate(CustomBase):
     name: str
-    complited: bool = False
+    completed: bool = False
 
 class SubtaskResponse(CustomBase):
     id: int
     name: str
-    complited: bool
+    completed: bool
     task_id: int
 
 class SubtaskPargination(CustomBase):
@@ -16,4 +16,4 @@ class SubtaskPargination(CustomBase):
 
 class SubtaskUpdate(CustomBase):
     name: Optional[str] = None
-    complited: Optional[bool] = None
+    completed: Optional[bool] = None
