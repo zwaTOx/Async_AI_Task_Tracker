@@ -6,6 +6,9 @@ class CommentBase(CustomBase):
 class CommentCreate(CommentBase):
     pass
 
+class CommentUpdate(CommentBase):
+    pass
+
 class CommentResponse(CommentBase):
     id: int
     owner_id: int

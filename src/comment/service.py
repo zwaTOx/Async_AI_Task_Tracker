@@ -1,7 +1,7 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .repository import CommentRepository
-from .schemes import CommentCreate, CommentResponse
+from .schemes import CommentCreate, CommentResponse, CommentUpdate
 
 class CommentService:
     def __init__(self, session: AsyncSession):
@@ -14,3 +14,10 @@ class CommentService:
     async def get_comments(self, task_id: int) -> CommentResponse:
         comments = await CommentRepository(self.session).get_all(task_id=task_id)
         return comments
+    
+    async def update_comment(self, comment_id: int, comment_data: CommentUpdate) -> CommentResponse:
+        upd_comment = await CommentRepository(self.session).update(comment_id, comment_data)
+        return upd_comment
+    
+    async def delete_comment(self, comment_id: int):
+        await CommentRepository(self.session).delete(comment_id)
