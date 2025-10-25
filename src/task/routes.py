@@ -4,11 +4,10 @@ from fastapi import APIRouter, Depends, Query, status
 import asyncio
 
 from src.database import DbSession
-from src.task.dependencies import verify_task_action, verify_update_task_perms, verify_delete_task_perms
-from src.user_project_association.dependencies import verify_project_action
+from src.task.dependencies import verify_task_action
 from src.user_project_association.access_config import Action, ResourceType
 from src.user.dependencies import CurrentUser
-from src.user_project_association.dependencies import verify_project_member, verify_create_task_perms
+from src.user_project_association.dependencies import verify_project_member
 from src.notification.service import send_notification_to_user
 from .service import TaskService
 from .schemas import TaskCreate, TaskPagination, TaskResponse, TaskResponseWithSubtasks, TaskUpdate
@@ -18,7 +17,9 @@ task_router = APIRouter()
 @task_router.get(
     "/{project_id}/tasks",
     response_model=TaskPagination,
-    dependencies=[Depends(verify_project_member)]
+    dependencies=[
+        Depends(verify_task_action(Action.VIEW))
+    ],
 )
 async def get_project_tasks(
     session: DbSession,
@@ -52,7 +53,9 @@ async def get_all_tasks_by_date(
 @task_router.get(
     "/{project_id}/tasks/{task_id}",
     response_model=TaskResponseWithSubtasks,
-    dependencies=[Depends(verify_project_member)]
+    dependencies=[
+        Depends(verify_task_action(Action.VIEW))
+    ],
 )
 async def get_task(
     session: DbSession,
@@ -68,7 +71,9 @@ async def get_task(
     "/{project_id}/tasks",
     status_code=status.HTTP_201_CREATED,
     response_model=TaskResponse,
-    dependencies=[Depends(verify_project_member), Depends(verify_create_task_perms)]
+    dependencies=[
+        Depends(verify_task_action(Action.CREATE))
+    ]
 )
 async def create_task(
     session: DbSession,
@@ -81,8 +86,10 @@ async def create_task(
 
 @task_router.patch(
     "/{project_id}/tasks/{task_id}",
-    dependencies=[Depends(verify_project_member), Depends(verify_update_task_perms)],
-    response_model=TaskResponse
+    response_model=TaskResponse,
+    dependencies=[
+        Depends(verify_task_action(Action.EDIT))
+    ],
 )
 async def update_task(
     session: DbSession,
@@ -98,10 +105,8 @@ async def update_task(
     "/{project_id}/tasks/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[
-        # Depends(verify_project_member), 
         Depends(verify_task_action(Action.DELETE))
     ]
-    # dependencies=[Depends(verify_project_member), Depends(verify_delete_task_perms)]
 )
 async def delete_task(
     session: DbSession,

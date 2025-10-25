@@ -24,6 +24,7 @@ async def verify_project_action(
         return
     if user_role not in permission_rule.roles:
         raise PermissionException(f"Недостаточно прав для выполнения действия {action.value}")
+    return user_role
 
 async def verify_project_admin(
     session: DbSession,
