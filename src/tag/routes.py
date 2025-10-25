@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, status
 
 from src.database import DbSession
 from src.user.dependencies import CurrentUser
-from src.user_project_association.dependencies import verify_project_admin, verify_project_member
-from .dependencies import verify_tag_exists
+from src.tag.dependencies import verify_tag_action
+from src.user_project_association.dependencies import Action
+from .dependencies import verify_tag_exists, verify_tag_action
 from .service import TagService
 from .schemes import TagCreate, TagResponse, TagPargination, TagUpdate
 
@@ -11,8 +12,10 @@ tag_router = APIRouter()
 
 @tag_router.get(
     "/{project_id}/tags",
-    dependencies=[Depends(verify_project_member)],
-    response_model=TagPargination
+    response_model=TagPargination,
+    dependencies=[
+        Depends(verify_tag_action(Action.VIEW))
+    ],
 )
 async def get_project_tags(
     session: DbSession,
@@ -24,7 +27,9 @@ async def get_project_tags(
 
 @tag_router.post(
     "/{project_id}/tags",
-    dependencies=[Depends(verify_project_admin)],
+    dependencies=[
+        Depends(verify_tag_action(Action.CREATE))
+    ],
     response_model=TagResponse,
     status_code=status.HTTP_201_CREATED
 )
@@ -39,7 +44,9 @@ async def create_tag(
 
 @tag_router.patch(
     "{project_id}/tags/{tag_id}",
-    dependencies=[Depends(verify_project_admin), Depends(verify_tag_exists)]
+    dependencies=[
+        Depends(verify_tag_action(Action.EDIT))
+    ], 
 )
 async def update_tag(
     session: DbSession,
@@ -53,8 +60,10 @@ async def update_tag(
 
 @tag_router.delete(
     "{project_id}/tags/{tag_id}",
-    dependencies=[Depends(verify_project_admin), Depends(verify_tag_exists)],
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[
+        Depends(verify_tag_action(Action.DELETE))
+    ]
 )    
 async def delete_tag(
     session: DbSession,
