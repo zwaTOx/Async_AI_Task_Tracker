@@ -20,7 +20,7 @@ def verify_task_action(action: Action):
             action=action,
             resource_type=ResourceType.TASK
         )
-        if task_id is None:
+        if action in [Action.CREATE, Action.VIEW]:
             return
         task = await TaskRepository(session).get_task(task_id)
         if not task or task.project_id != project_id: 

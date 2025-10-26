@@ -5,7 +5,7 @@ from src.user.dependencies import CurrentUser
 
 from .service import CommentService
 from .schemes import CommentCreate, CommentResponse, CommentPargination, CommentUpdate
-from .dependencies import verify_comment_action, Action
+from .dependencies import verify_comment_creation, verify_comment_modification, Action
 
 task_comment_router = APIRouter()
 
@@ -21,15 +21,16 @@ async def get_task_comments(
     user: CurrentUser,
     project_id: int,
     task_id: int,
+    comment_id: int = None
 ):
-    comments = await CommentService(session).get_comments(task_id)
+    comments = await CommentService(session).get_comments(task_id, comment_id)
     return {'items': comments}
 
 @task_comment_router.post(
     "{project_id}/tasks/{task_id}/comments",
     dependencies=[
         Depends(verify_task_action(action=Action.VIEW)),
-        Depends(verify_comment_action(Action.CREATE))
+        Depends(verify_comment_creation())
     ],
     response_model=CommentResponse,
     status_code=status.HTTP_201_CREATED
@@ -39,16 +40,17 @@ async def post_comment(
     user: CurrentUser,
     project_id: int,
     task_id: int,
-    comment_data: CommentCreate
+    comment_data: CommentCreate,
+    comment_id: int = None
 ):
-    new_comment = await CommentService(session).create_comment(user.id, task_id, comment_data)
+    new_comment = await CommentService(session).create_comment(user.id, task_id, comment_id, comment_data)
     return new_comment
 
 @task_comment_router.patch(
     "{project_id}/tasks/{task_id}/comments/{comment_id}",
     dependencies=[
         Depends(verify_task_action(action=Action.VIEW)),
-        Depends(verify_comment_action(Action.EDIT))
+        Depends(verify_comment_modification(Action.EDIT))
     ],
     response_model=CommentResponse,
 )
@@ -67,7 +69,7 @@ async def update_comment(
     "{project_id}/tasks/{task_id}/comments/{comment_id}",
     dependencies=[
         Depends(verify_task_action(action=Action.VIEW)),
-        Depends(verify_comment_action(Action.DELETE))
+        Depends(verify_comment_modification(Action.DELETE))
     ],
     status_code=status.HTTP_204_NO_CONTENT
 )

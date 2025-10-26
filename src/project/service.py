@@ -22,8 +22,6 @@ class ProjectService:
     
     async def delete_project(self, user_id: int, project_id: int):
         project = await ProjectRepository(self.session).get_project(project_id)
-        if not project:
-            raise NotFoundException("Проект не найден")
         if project.owner_id != user_id:
             raise PermissionError
         await ProjectRepository(self.session).delete_project(project_id)

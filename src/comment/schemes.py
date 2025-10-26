@@ -1,3 +1,4 @@
+from typing import Optional
 from src.schemas import CustomBase
 
 class CommentBase(CustomBase):
@@ -13,6 +14,7 @@ class CommentResponse(CommentBase):
     id: int
     owner_id: int
     task_id: int
+    parent_comment_id: Optional[int] = None
 
 class CommentPargination(CustomBase):
     items: list[CommentResponse]
