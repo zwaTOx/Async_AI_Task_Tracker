@@ -14,6 +14,12 @@ class Comment(Base, TimeStampMixin):
         nullable=True
     )
     creator = relationship('User', foreign_keys=[owner_id], backref="created_comments")
+    parent_comment = relationship(
+        'Comment', 
+        foreign_keys=[parent_comment_id],
+        remote_side='Comment.id',  
+        backref=backref('replies')
+    )
 
     @property
     def replies_count(self) -> int:

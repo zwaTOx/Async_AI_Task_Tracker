@@ -12,12 +12,16 @@ class CommentCreate(CommentBase):
 class CommentUpdate(CommentBase):
     pass
 
+class ParentCommentResponse(CommentBase):
+    creator: UserTaskResponse
+
 class CommentResponse(CommentBase):
     id: int
     owner_id: int
     task_id: int
     parent_comment_id: Optional[int] = None
     creator: UserTaskResponse
+    parent_comment: Optional[ParentCommentResponse]
     created_at: datetime
     updated_at: datetime
 
