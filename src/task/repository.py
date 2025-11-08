@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 from sqlalchemy import and_, func, or_, select
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, joinedload
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.repository import SQLAlchemyRepository
@@ -59,7 +59,13 @@ class TaskRepository(SQLAlchemyRepository):
         return result.scalar_one_or_none()
 
     async def get_task_with_subtasks(self, task_id: int) -> TaskResponseWithSubtasks:
-        statement = select(Task).where(Task.id == task_id).options(selectinload(Task.subtasks)).options(selectinload(Task.tags))
+        statement = select(Task).where(Task.id == task_id)\
+            .options(
+            selectinload(Task.subtasks),
+            selectinload(Task.tags),
+            joinedload(Task.creator),        
+            joinedload(Task.performer)       
+        )
         result = await self.session.exec(statement)
         return result.scalars().first()
     

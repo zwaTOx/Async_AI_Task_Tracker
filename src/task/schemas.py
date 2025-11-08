@@ -32,10 +32,18 @@ class TaskCreate(CustomBase):
 class TaskResponse(TimeStampSchema, TaskBase):
     pass
 
-class TaskResponseWithSubtasks(TaskResponse):
-    subtasks: list[SubtaskResponse]
-    tags: list[TagResponse]
+class TaskUserResponse(CustomBase):
+    id: int
+    username: str
+    nickname: Optional[str]
+    icon_id: Optional[int]
 
+class TaskResponseWithSubtasks(TaskResponse):
+    tags: list[TagResponse]
+    subtasks: list[SubtaskResponse]
+    creator: TaskUserResponse
+    performer: Optional[TaskUserResponse]
+    
 class TaskPagination(CustomBase):
     items: list[TaskResponse]
 
