@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 from typing import List, Optional
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
 import asyncio
 
 from src.database import DbSession
@@ -9,6 +9,7 @@ from src.user_project_association.access_config import Action, ResourceType
 from src.user.dependencies import CurrentUser
 from .service import TaskService
 from .schemas import TaskCreate, TaskPagination, TaskResponse, TaskResponseWithSubtasks, TaskUpdate
+from src.websocket.manager import ws_manager
 
 task_router = APIRouter()
 
@@ -21,10 +22,12 @@ task_router = APIRouter()
 )
 async def get_project_tasks(
     session: DbSession,
+    bg_task: BackgroundTasks,
     user: CurrentUser,
     project_id: int,
 ):
     tasks = await TaskService(session).get_tasks(project_id)
+    bg_task.add_task(ws_manager.broadcast_to_project, project_id, {'action': "get_task", 'user_id': user.id})
     return {"items" :tasks}
 
 @task_router.get(

@@ -1,6 +1,6 @@
 from fastapi import WebSocket
 
-from src.database import DbSession
+from src.database import async_session
 from src.project.repository import ProjectRepository
 from src.user_project_association.repository import UserProjectAssociationRepository
 
@@ -29,21 +29,26 @@ class ConnectionManager:
         if self.active_connections.get(user_id):
             await self.active_connections[user_id].send_json(payload)
 
-    async def broadcast_to_project(self, session: DbSession, project_id: int, message_data: dict):
+    async def broadcast_to_project(self, project_id: int, message_data: dict):
         disconnected_users = []
-        chat_user_repo = UserProjectAssociationRepository(session)
-        chat_members = await chat_user_repo.get_project_memberships(project_id)
-        for member in chat_members:
-            user_id = member.user_id
-            print(f'id: {user_id}')
-            if user_id in self.active_connections:
-                try:
-                    print(f'Sended')
-                    await self.active_connections[user_id].send_json(message_data)
-                except Exception:
-                    print(f'Dissconnect')
-                    disconnected_users.append(user_id)
-    
+        async with async_session() as session:
+            try:
+                chat_user_repo = UserProjectAssociationRepository(session)
+                chat_members = await chat_user_repo.get_project_memberships(project_id)
+                
+                for member in chat_members:
+                    user_id = member.user_id
+                    print(f'id: {user_id}')
+                    if user_id in self.active_connections:
+                        try:
+                            print(f'Sended')
+                            await self.active_connections[user_id].send_json(message_data)
+                        except Exception:
+                            print(f'Dissconnect')
+                            disconnected_users.append(user_id)
+            finally:
+                await session.close()
+        
         for user_id in disconnected_users:
             if user_id in self.active_connections:
                 del self.active_connections[user_id]

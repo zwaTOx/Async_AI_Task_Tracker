@@ -19,4 +19,4 @@ async def connect_to_ws(
             await ws_manager.send_personal_message(user.id, {"type": "echo", "payload": data})
 
     except WebSocketDisconnect:
-        ws_manager.disconnect(websocket)
+        ws_manager.disconnect(websocket, user.id)
