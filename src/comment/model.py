@@ -7,17 +7,13 @@ class Comment(Base, TimeStampMixin):
     id: Mapped[int_pk]
     text: Mapped[str]
 
-    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    task_id: Mapped[int] = mapped_column(ForeignKey('tasks.id'))
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    task_id: Mapped[int] = mapped_column(ForeignKey('tasks.id', ondelete="CASCADE"))
     parent_comment_id: Mapped[int | None] = mapped_column(
-        ForeignKey("comments.id", ondelete="CASCADE"), 
+        ForeignKey("comments.id", ondelete="SET NULL"), 
         nullable=True
     )
-    replies: Mapped[list["Comment"]] = relationship(
-        "Comment",
-        backref=backref("parent", remote_side="Comment.id")
-    )
-    # task: Mapped["Task"] = relationship("Task", back_populates="comments")
+    creator = relationship('User', foreign_keys=[owner_id], backref="created_comments")
 
     @property
     def replies_count(self) -> int:

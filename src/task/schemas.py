@@ -4,7 +4,8 @@ from typing import Literal, Optional
 from pydantic import Field
 from src.schemas import CustomBase, TimeStampSchema
 from src.subtask.schemas import SubtaskResponse
-from src.tag.schemes import TagResponse 
+from src.tag.schemes import TagResponse
+from src.user.schemes import UserTaskResponse 
 
 class TaskBase(CustomBase):
     id: int
@@ -32,17 +33,11 @@ class TaskCreate(CustomBase):
 class TaskResponse(TimeStampSchema, TaskBase):
     pass
 
-class TaskUserResponse(CustomBase):
-    id: int
-    username: str
-    nickname: Optional[str]
-    icon_id: Optional[int]
-
 class TaskResponseWithSubtasks(TaskResponse):
     tags: list[TagResponse]
     subtasks: list[SubtaskResponse]
-    creator: TaskUserResponse
-    performer: Optional[TaskUserResponse]
+    creator: UserTaskResponse
+    performer: Optional[UserTaskResponse]
     
 class TaskPagination(CustomBase):
     items: list[TaskResponse]

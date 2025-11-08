@@ -28,6 +28,12 @@ class UserResponse(CustomBase):
     bio: str = BIO_FIELD
     icon_id: int | None
 
+class UserTaskResponse(CustomBase):
+    id: int
+    username: str
+    nickname: Optional[str]
+    icon_id: Optional[int]
+
 class UserCreate(CustomBase):
     email: EmailStr
     username: Optional[UsernameType] = USERNAME_FIELD

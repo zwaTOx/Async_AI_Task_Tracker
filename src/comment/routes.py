@@ -23,7 +23,7 @@ async def get_task_comments(
     task_id: int,
     comment_id: int = None
 ):
-    comments = await CommentService(session).get_comments(task_id, comment_id)
+    comments = await CommentService(session).get_comments(task_id)
     return {'items': comments}
 
 @task_comment_router.post(
