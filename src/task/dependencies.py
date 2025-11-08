@@ -25,14 +25,16 @@ def verify_task_action(action: Action):
         task = await TaskRepository(session).get_task(task_id)
         if not task or task.project_id != project_id: 
             raise NotFoundException('Задача не найдена в прокте')
-        if user_role in [UserRole.ADMINISTRATOR, UserRole.OWNER]:
+        print([user_role, UserRole.OWNER])
+        if user_role in [UserRole.ADMINISTRATOR.value, UserRole.OWNER.value]:
             return
         if action == Action.DELETE:
             if task.creator_id != user.id:
                 raise PermissionException(f"Недостаточно прав для выполнения действия")
         if action == Action.EDIT:
+            print([task.performer_id, task.creator_id])
             if user.id not in [task.performer_id, task.creator_id]:
-                raise PermissionException(f"Недостаточно прав для выполнения действия")
+                raise PermissionException(f"Недостаточно прав для выполнения действия!")
     return dependency
 
 async def verify_task_exists(

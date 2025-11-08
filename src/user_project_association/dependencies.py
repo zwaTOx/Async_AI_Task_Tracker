@@ -21,10 +21,10 @@ async def verify_project_action(
     if not permission_rule:
         raise PermissionException(f"Действие {action.value} не разрешено для ресурса {resource_type.value}")
     if permission_rule.is_author:
-        return
+        return user_role.value
     if user_role not in permission_rule.roles:
         raise PermissionException(f"Недостаточно прав для выполнения действия {action.value}")
-    return user_role
+    return user_role.value
 
 async def verify_project_admin(
     session: DbSession,

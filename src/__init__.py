@@ -14,6 +14,7 @@ from src.theme.routes import theme_router
 from src.notification.routes import notification_router
 from src.tag.routes import tag_router
 from src.comment.routes import task_comment_router
+from src.websocket.router import ws_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -75,4 +76,7 @@ app.include_router(
 )
 app.include_router(
     task_comment_router, prefix="/api/projects", tags=["Task Comment"]
+)
+app.include_router(
+    ws_router
 )

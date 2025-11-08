@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.exceptions import BadRequestException, PermissionException
+from src.user_project_association.access_config import UserRole
 from .schemas import TaskCreate, TaskResponse, TaskResponseWithSubtasks, TaskUpdate
 from src.user_project_association.repository import UserProjectAssociationRepository
 from src.tag.repository import TagRepository
@@ -61,11 +62,12 @@ class TaskService:
     
     async def update_task(self,
             user_id: int, project_id: int, task_id: int, task_update: TaskUpdate):
+        member = await UserProjectAssociationRepository(self.session).get_membership(user_id, project_id)
         task = await TaskRepository(self.session).get_task(task_id)
         if task.performer_id == user_id:
             update_data = task_update.model_dump(exclude_unset=True)
-            if update_data and set(update_data.keys()) != {'status'}:
-                raise PermissionException("Исполнителю разрешено обновлять только поле status")
+            if member.role not in [UserRole.ADMINISTRATOR.value, UserRole.OWNER.value] and update_data and set(update_data.keys()) != {'status'}:
+                raise PermissionException("Исполнителю разрешено обновлять только поле stsatus")
         if task_update.performer_id is not None and task_update.performer_id!=0:
             performer = await UserProjectAssociationRepository(self.session).get_membership(task_update.performer_id, project_id)
             if performer is None:
