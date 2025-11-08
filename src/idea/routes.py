@@ -4,13 +4,14 @@ from src.user.dependencies import CurrentUser
 from src.user_project_association.dependencies import verify_project_action
 
 from .service import IdeaService
-from .schemes import IdeaCreateRequest
+from .schemes import IdeaCreateRequest, IdeaPagination, IdeaVoitesResponse
 
 idea_router = APIRouter()
 
 @idea_router.get(
     "/{project_id}/themes/{theme_id}/ideas",
     # dependencies=[Depends(verify_project_action(action='VIEW'))]
+    response_model=IdeaPagination
 )
 async def get_theme_ideas(
     session: DbSession,

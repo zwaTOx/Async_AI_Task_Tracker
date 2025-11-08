@@ -16,7 +16,7 @@ class IdeaService:
         theme = await ThemeRepository(self.session).get(theme_id)
         if not theme:
             raise NotFoundException('Тема не найдена')
-        ideas = await IdeaRepository(self.session).get_all(project_id=project_id, theme_id=theme_id)
+        ideas = await IdeaRepository(self.session).get_all(user_id=user_id, project_id=project_id, theme_id=theme_id)
         return ideas
 
     async def create_idea(self, 

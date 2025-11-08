@@ -71,10 +71,10 @@ app.include_router(
     theme_router, prefix="/api/projects", tags=['Theme']
 )
 app.include_router(
-    vote_router, prefix="/api/projects", tags=['Vote']
+    idea_router, prefix="/api/projects", tags=['Idea']
 )
 app.include_router(
-    idea_router, prefix="/api/projects", tags=['Idea']
+    vote_router, prefix="/api/projects", tags=['Vote']
 )
 app.include_router(
     notification_router, prefix="", tags=["Notification"]
