@@ -13,6 +13,7 @@ class ResourceType(Enum):
     TASK = "task"
     COMMENT = "comment"
     TAG = 'tag'
+    IDEA = 'idea'
 
 class Action(Enum):
     VIEW = "view"
@@ -81,5 +82,17 @@ class ProjectPermissions:
             Action.DELETE: PermissionRule(roles={
                 UserRole.ADMINISTRATOR, UserRole.OWNER
             }, is_author=True),  
+        },
+        ResourceType.IDEA: {
+            Action.VIEW: PermissionRule(),
+            Action.CREATE: PermissionRule(roles={
+                UserRole.ADMINISTRATOR, UserRole.OWNER
+            }),
+            Action.EDIT: PermissionRule(roles={
+                UserRole.ADMINISTRATOR, UserRole.OWNER
+            }, is_author=True), 
+            Action.DELETE: PermissionRule(roles={
+                UserRole.ADMINISTRATOR, UserRole.OWNER
+            }, is_author=True),
         },
     }
