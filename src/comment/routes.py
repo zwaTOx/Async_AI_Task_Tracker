@@ -4,7 +4,7 @@ from src.task.dependencies import verify_task_action
 from src.user.dependencies import CurrentUser
 
 from .service import CommentService
-from .schemes import CommentCreate, CommentResponse, CommentPargination, CommentUpdate
+from .schemes import CommentCreate, CommentResponse, CommentPargination, CommentUpdate, PaginationParams
 from .dependencies import verify_comment_creation, verify_comment_modification, Action
 
 task_comment_router = APIRouter()
@@ -21,10 +21,10 @@ async def get_task_comments(
     user: CurrentUser,
     project_id: int,
     task_id: int,
-    comment_id: int = None
+    pagination: PaginationParams = Depends()
 ):
-    comments = await CommentService(session).get_comments(task_id)
-    return {'items': comments}
+    comments = await CommentService(session).get_comments(task_id, pagination)
+    return {'params': pagination, 'items': comments}
 
 @task_comment_router.post(
     "{project_id}/tasks/{task_id}/comments",

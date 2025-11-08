@@ -25,5 +25,10 @@ class CommentResponse(CommentBase):
     created_at: datetime
     updated_at: datetime
 
+class PaginationParams(CustomBase):
+    skip: int = 0
+    limit: int = 10
+
 class CommentPargination(CustomBase):
     items: list[CommentResponse]
+    params: PaginationParams

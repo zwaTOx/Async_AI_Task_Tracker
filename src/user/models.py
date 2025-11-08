@@ -11,4 +11,5 @@ class User(Base):
     bio: Mapped[str] = mapped_column(String(), default="")
     icon_id: Mapped[int] = mapped_column(ForeignKey("attachments.id"), nullable=True)
 
+    # created_tasks = relationship("Task", foreign_keys="Task.creator_id", back_populates="creator")
     projects = relationship("Project", secondary="userprojectassociations", back_populates="members")
