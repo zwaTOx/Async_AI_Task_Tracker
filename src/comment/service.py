@@ -18,12 +18,14 @@ class CommentService:
         )
         return new_comment
     
-    async def get_comments(self, task_id: int, parent_comment_id: int) -> CommentResponse:
+    async def get_comments(self, task_id: int, parent_comment_id: int|None) -> CommentResponse:
         if parent_comment_id:
             comment = await CommentRepository(self.session).get(parent_comment_id)
             if not comment or comment.task_id != task_id:
                 raise NotFoundException("Комментарий не найден в задаче")
-        return await CommentRepository(self.session).get_all(task_id=task_id, parent_comment_id=parent_comment_id)
+        if parent_comment_id:
+            return await CommentRepository(self.session).get_all(task_id=task_id, parent_comment_id=parent_comment_id)
+        return await CommentRepository(self.session).get_all(task_id=task_id)
     
     async def update_comment(self, comment_id: int, comment_data: CommentUpdate) -> CommentResponse:
         upd_comment = await CommentRepository(self.session).update(comment_id, comment_data)

@@ -24,9 +24,6 @@ def verify_comment_creation():
             parent_comment = await CommentRepository(session).get(comment_id)
             if parent_comment is None or parent_comment.task_id != task_id:
                 raise NotFoundException("Родительский комментарий не найден")
-            if parent_comment.parent_comment_id is not None:
-                raise BadRequestException("Нельзя создавать ответы на ответы")
-    
     return dependency
 
 def verify_comment_modification(action: Action):

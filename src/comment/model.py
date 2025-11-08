@@ -1,8 +1,9 @@
 from src.database import Base, int_pk
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 from sqlalchemy import ForeignKey
+from src.models import TimeStampMixin
 
-class Comment(Base):
+class Comment(Base, TimeStampMixin):
     id: Mapped[int_pk]
     text: Mapped[str]
 
