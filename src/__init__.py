@@ -12,6 +12,7 @@ from src.task.routes import task_router
 from src.subtask.routes import subtask_router
 from src.theme.routes import theme_router
 from src.idea.routes import idea_router
+from src.vote.routes import vote_router
 from src.notification.routes import notification_router
 from src.tag.routes import tag_router
 from src.comment.routes import task_comment_router
@@ -68,6 +69,9 @@ app.include_router(
 )
 app.include_router(
     theme_router, prefix="/api/projects", tags=['Theme']
+)
+app.include_router(
+    vote_router, prefix="/api/projects", tags=['Vote']
 )
 app.include_router(
     idea_router, prefix="/api/projects", tags=['Idea']
