@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 from src.schemas import CustomBase
 from pydantic import Field
 
@@ -12,4 +12,5 @@ class ThemeCreate(ThemeBase):
 class ThemeUpdate(CustomBase):
     name: Optional[str] = None
     description: Optional[str] = None
+    stage: Optional[Literal["Brainshtorm", "Vote", "Finish"]] = None
     max_voices: Optional[int] = Field(default=None, ge=1)
