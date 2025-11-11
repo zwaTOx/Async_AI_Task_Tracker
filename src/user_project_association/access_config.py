@@ -56,24 +56,18 @@ class ProjectPermissions:
             Action.CREATE: PermissionRule(roles={
                 UserRole.MEMBER, UserRole.ADMINISTRATOR, UserRole.OWNER
             }),
-            Action.EDIT: PermissionRule(roles={
+            Action.MANAGE: PermissionRule(roles={
                 UserRole.ADMINISTRATOR, UserRole.OWNER
-            }, is_author=True), 
-            Action.DELETE: PermissionRule(roles={
-                UserRole.ADMINISTRATOR, UserRole.OWNER
-            }, is_author=True),
+            }, is_author=True)
         },
         ResourceType.TAG: {
             Action.VIEW: PermissionRule(),
             Action.CREATE: PermissionRule(roles={
                 UserRole.ADMINISTRATOR, UserRole.OWNER
             }),
-            Action.EDIT: PermissionRule(roles={
+            Action.MANAGE: PermissionRule(roles={
                 UserRole.ADMINISTRATOR, UserRole.OWNER
-            }),
-            Action.DELETE: PermissionRule(roles={
-                UserRole.ADMINISTRATOR, UserRole.OWNER
-            }),
+            })
         },
         ResourceType.COMMENT: {
             Action.VIEW: PermissionRule(),
@@ -88,9 +82,7 @@ class ProjectPermissions:
             Action.CREATE: PermissionRule(roles={
                 UserRole.ADMINISTRATOR, UserRole.OWNER
             }),
-            Action.EDIT: PermissionRule(roles={
-                UserRole.ADMINISTRATOR, UserRole.OWNER
-            }, is_author=True), 
+            Action.EDIT: PermissionRule(is_author=True), 
             Action.DELETE: PermissionRule(roles={
                 UserRole.ADMINISTRATOR, UserRole.OWNER
             }, is_author=True),

@@ -8,8 +8,7 @@ ACCESS_CONFIG_JSON = {
     "task": {
         "view": ["READER", "USER", "ADMINISTRATOR", "OWNER"],
         "create": ["USER", "ADMINISTRATOR", "OWNER"],
-        "edit": ["ADMINISTRATOR", "OWNER"],
-        "delete": ["ADMINISTRATOR", "OWNER"]
+        "manage": ["ADMINISTRATOR", "OWNER"],
     },
     "comment": {
         "view": ["READER", "USER", "ADMINISTRATOR", "OWNER"],

@@ -18,8 +18,8 @@ class ProjectRoleChecker:
             return ACCESS_CONFIG_JSON[self.resource][self.action]
         except KeyError:
             raise ValueError(
-                f"Не найдена конфигурация прав для ресурса '{self.resource.value}' "
-                f"и действия '{self.action.value}'"
+                f"Не найдена конфигурация прав для ресурса '{self.resource}' "
+                f"и действия '{self.action}'"
             )
 
     async def __call__(self, 
@@ -56,11 +56,8 @@ def can_create_task():
 def can_view_task():
     return ProjectRoleChecker(ResourceType.TASK, Action.VIEW)
 
-def can_edit_task():
-    return ProjectRoleChecker(ResourceType.TASK, Action.EDIT)
-
-def can_delete_task():
-    return ProjectRoleChecker(ResourceType.TASK, Action.DELETE)
+def can_manage_task():
+    return ProjectRoleChecker(ResourceType.TASK, Action.MANAGE)
 
 #COMMENT
 def can_create_comment():
@@ -69,11 +66,8 @@ def can_create_comment():
 def can_view_comment():
     return ProjectRoleChecker(ResourceType.COMMENT, Action.VIEW)
 
-def can_edit_comment():
-    return ProjectRoleChecker(ResourceType.COMMENT, Action.EDIT)
-
-def can_delete_comment():
-    return ProjectRoleChecker(ResourceType.COMMENT, Action.DELETE)
+def can_manage_comment():
+    return ProjectRoleChecker(ResourceType.COMMENT, Action.MANAGE)
 
 #TAG
 def can_create_tag():
@@ -82,11 +76,8 @@ def can_create_tag():
 def can_view_tag():
     return ProjectRoleChecker(ResourceType.TAG, Action.VIEW)
 
-def can_edit_tag():
-    return ProjectRoleChecker(ResourceType.TAG, Action.EDIT)
-
-def can_delete_tag():
-    return ProjectRoleChecker(ResourceType.TAG, Action.DELETE)
+def can_manage_tag():
+    return ProjectRoleChecker(ResourceType.TAG, Action.MANAGE)
 
 #IDEA
 def can_create_idea():
@@ -95,8 +86,5 @@ def can_create_idea():
 def can_view_idea():
     return ProjectRoleChecker(ResourceType.IDEA, Action.VIEW)
 
-def can_edit_idea():
+def can_manage_idea():
     return ProjectRoleChecker(ResourceType.IDEA, Action.EDIT)
-
-def can_delete_idea():
-    return ProjectRoleChecker(ResourceType.IDEA, Action.DELETE)
