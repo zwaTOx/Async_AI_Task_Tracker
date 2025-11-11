@@ -74,7 +74,7 @@ app.include_router(
     idea_router, prefix="/api/projects", tags=['Idea']
 )
 app.include_router(
-    vote_router, prefix="/api/projects", tags=['Vote']
+    vote_router, prefix="/api/projects", tags=['Idea']
 )
 app.include_router(
     notification_router, prefix="", tags=["Notification"]
