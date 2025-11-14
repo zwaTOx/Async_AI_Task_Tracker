@@ -10,7 +10,7 @@ from .dependencies import verify_comment_creation, verify_comment_modification, 
 task_comment_router = APIRouter()
 
 @task_comment_router.get(
-    "{project_id}/tasks/{task_id}/comments",
+    "/{project_id}/tasks/{task_id}/comments",
     dependencies=[
         Depends(verify_task_action(action=Action.VIEW))
     ],
@@ -27,7 +27,7 @@ async def get_task_comments(
     return {'params': pagination, 'items': comments}
 
 @task_comment_router.post(
-    "{project_id}/tasks/{task_id}/comments",
+    "/{project_id}/tasks/{task_id}/comments",
     dependencies=[
         Depends(verify_task_action(action=Action.VIEW)),
         Depends(verify_comment_creation())
@@ -47,7 +47,7 @@ async def post_comment(
     return new_comment
 
 @task_comment_router.patch(
-    "{project_id}/tasks/{task_id}/comments/{comment_id}",
+    "/{project_id}/tasks/{task_id}/comments/{comment_id}",
     dependencies=[
         Depends(verify_task_action(action=Action.VIEW)),
         Depends(verify_comment_modification(Action.EDIT))
@@ -66,7 +66,7 @@ async def update_comment(
     return new_comment
 
 @task_comment_router.delete(
-    "{project_id}/tasks/{task_id}/comments/{comment_id}",
+    "/{project_id}/tasks/{task_id}/comments/{comment_id}",
     dependencies=[
         Depends(verify_task_action(action=Action.VIEW)),
         Depends(verify_comment_modification(Action.DELETE))
