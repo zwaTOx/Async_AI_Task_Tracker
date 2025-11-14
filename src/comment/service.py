@@ -8,7 +8,7 @@ class CommentService:
     def __init__(self, session: AsyncSession):
         self.session = session
     
-    async def create_comment(self, user_id: int, task_id: int, parent_comment_id: int, comment_data: CommentCreate) -> CommentResponse:
+    async def create_comment(self, user_id: int, task_id: int, parent_comment_id: int|None, comment_data: CommentCreate) -> CommentResponse:
         if parent_comment_id:
             parent_comment = await CommentRepository(self.session).get(parent_comment_id)
             if not parent_comment or parent_comment.task_id != task_id:
