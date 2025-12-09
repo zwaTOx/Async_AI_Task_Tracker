@@ -20,7 +20,7 @@ class CommentRepository(SQLAlchemyRepository):
             selectinload(Comment.creator),
             selectinload(Comment.parent_comment).selectinload(Comment.creator)
         )
-        .order_by(Comment.created_at.desc())
+        .order_by(Comment.created_at.asc())
         .offset(pagination.skip)
         .limit(pagination.limit)
     )
