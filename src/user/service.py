@@ -62,7 +62,7 @@ class UserService:
         if not verify_password(user.hashed_password, upd_data.old_password):
             raise BadRequestException("Неверный пароль")
         if upd_data.new_password == upd_data.old_password:
-            raise BadRequestException("Нельзя изменить пароль на старный пароль")
+            raise BadRequestException("Нельзя изменить пароль на старый пароль")
         await UserRepository(self.session).update_password(user_id, upd_data.new_password)
 
     async def reset_password(self, token: str, password_update_data: ResetPasswordData):
