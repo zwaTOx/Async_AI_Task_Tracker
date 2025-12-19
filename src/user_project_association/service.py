@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 import asyncio
 
 from src.exceptions import PermissionException, NotFoundException, BadRequestException, IternalServerException
+from src.project.repository import ProjectRepository
+from src.user.dependencies import CurrentUser
 from src.user.repository import UserRepository
 from src.code.utils import create_invite_project_token, decode_invite_project_token
 from src.email.invite import send_project_invite
@@ -41,7 +43,7 @@ class ProjectAssociationService:
         return membership
 
     async def invite_member_by_email(self, 
-        user, 
+        user: CurrentUser, 
         project_id: int, 
         inv_email: str,
         inv_role: str
@@ -60,7 +62,8 @@ class ProjectAssociationService:
             raise BadRequestException("Пользователь уже является частью проекта")
         invite_token = create_invite_project_token(project_id, founded_user.id, inv_role)
         url = f"{settings.BASE_URL}/users/invite?access_token={invite_token}"
-        asyncio.create_task(send_project_invite(founded_user.email, "Noname", "Noname", url))
+        project = await ProjectRepository(self.session).get_project(project_id)
+        asyncio.create_task(send_project_invite(founded_user.email, user.nickname, project.name, url))
 
     async def confirm_invite(self, 
         invite_token: str
