@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .repository import NotificationRepository
 from .schemes import NotificationCreate, NotificationResponse, ProjectNotificationCreate
 from src.user_project_association.repository import UserProjectAssociationRepository
+from src.websocket.manager import ws_manager
 
 class NotificationService:
     def __init__(self, session: AsyncSession):
@@ -15,8 +16,9 @@ class NotificationService:
         notifications = await NotificationRepository(self.session).get_user_notifications(user_id, limit)
         return notifications
     
-    async def create_notification(self, notif_data: NotificationCreate) -> NotificationResponse:
+    async def send_notification(self, notif_data: NotificationCreate) -> NotificationResponse:
         new_notif = await NotificationRepository(self.session).create(notif_data)
+        ws_manager.send_personal_message(notif_data.user_id, notif_data.model_dump_json(exclude="user_id"))
         return NotificationResponse.model_validate(new_notif)
     
     async def create_project_notification(self, user_id: int, project_id: int, notif_data: ProjectNotificationCreate) -> List[NotificationResponse]:

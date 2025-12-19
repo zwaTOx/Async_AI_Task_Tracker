@@ -27,29 +27,29 @@ async def get_notifications(
         "limit": limit
     }
 
-@notification_router.post(
-    "/api/notifications",
-    response_model=NotificationResponse
-)
-async def create_notification(
-    background_tasks: BackgroundTasks,
-    session: DbSession,
-    user: CurrentUser,
-    notif_data: NotificationCreate
-):
-    new_notif = await NotificationService(session).create_notification(notif_data)
-    return new_notif
+# @notification_router.post(
+#     "/api/notifications",
+#     response_model=NotificationResponse
+# )
+# async def create_notification(
+#     background_tasks: BackgroundTasks,
+#     session: DbSession,
+#     user: CurrentUser,
+#     notif_data: NotificationCreate
+# ):
+#     new_notif = await NotificationService(session).create_notification(notif_data)
+#     return new_notif
 
-@notification_router.post(
-    "/api/notifications/project/{project_id}",
-    dependencies=[Depends(verify_project_member)]
-)
-async def create_project_notification(
-    background_tasks: BackgroundTasks,
-    session: DbSession,
-    user: CurrentUser,
-    project_id: int,
-    notif_data: ProjectNotificationCreate
-):
-    notifications = await NotificationService(session).create_project_notification(user.id, project_id, notif_data)
-    return {"notifications": notifications}
+# @notification_router.post(
+#     "/api/notifications/project/{project_id}",
+#     dependencies=[Depends(verify_project_member)]
+# )
+# async def create_project_notification(
+#     background_tasks: BackgroundTasks,
+#     session: DbSession,
+#     user: CurrentUser,
+#     project_id: int,
+#     notif_data: ProjectNotificationCreate
+# ):
+#     notifications = await NotificationService(session).create_project_notification(user.id, project_id, notif_data)
+#     return {"notifications": notifications}

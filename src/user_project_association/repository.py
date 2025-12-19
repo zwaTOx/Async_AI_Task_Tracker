@@ -14,7 +14,7 @@ class UserProjectAssociationRepository:
         result = await self.session.exec(statement)
         return result.all()
 
-    async def get_membership(self, user_id: int, project_id: int):
+    async def get_membership(self, user_id: int, project_id: int) -> UserProjectAssociation:
         statement = select(UserProjectAssociation).filter(UserProjectAssociation.user_id == user_id, UserProjectAssociation.project_id==project_id)
         result = await self.session.exec(statement)
         return result.first()
