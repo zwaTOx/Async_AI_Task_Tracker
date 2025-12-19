@@ -53,7 +53,7 @@ class TaskRepository(SQLAlchemyRepository):
         result = await self.session.exec(statement)
         return result.scalars().all()
     
-    async def get_task(self, task_id: int):
+    async def get_task(self, task_id: int) -> Task:
         statement = select(Task).filter(Task.id==task_id).options(selectinload(Task.tags))
         result = await self.session.exec(statement)
         return result.scalar_one_or_none()

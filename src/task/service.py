@@ -56,10 +56,12 @@ class TaskService:
             performer = await UserProjectAssociationRepository(self.session).get_membership(task_create.performer_id, project_id)
             if performer is None:
                 raise BadRequestException("Исполнитель не является участником проекта")
-            NotificationService.send_notification(NotificationCreate(
-                message="На вас назначена задача",
-                user_id=performer.user_id,
-            ))
+            await NotificationService(self.session).send_notification(performer.user_id,
+                NotificationCreate(
+                    message="На вас назначена новая задача",
+                    user_id=performer.user_id,
+                )
+            )
         if task_create.start and task_create.end:
             if task_create.start > task_create.end:
                 raise BadRequestException("Дата начала не может быть позже даты окончания")
@@ -73,7 +75,15 @@ class TaskService:
         if task.performer_id == user_id:
             update_data = task_update.model_dump(exclude_unset=True)
             if member.role not in [UserRole.ADMINISTRATOR.value, UserRole.OWNER.value] and update_data and set(update_data.keys()) != {'status'}:
-                raise PermissionException("Исполнителю разрешено обновлять только поле stsatus")
+                raise PermissionException("Исполнителю разрешено обновлять только поле status")
+            upd_task = await TaskRepository(self.session).update_task(task_id, task_update)
+            await NotificationService(self.session).send_notification(
+                task.creator_id,
+                NotificationCreate(
+                    message=f"Статус задачи {task.title} изменен исполнителем",
+                )
+            )
+            return upd_task
         if task_update.performer_id is not None and task_update.performer_id!=0:
             performer = await UserProjectAssociationRepository(self.session).get_membership(task_update.performer_id, project_id)
             if performer is None:

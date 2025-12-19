@@ -25,7 +25,7 @@ class TaskCreate(CustomBase):
     description: Optional[str]
     color: str
     priority: Optional[Literal["Низкий", "Средний", "Высокий", "Критический"]] = Field(default=None)
-    status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(default="Назначена")
+    status: Optional[Literal["Назначена", "В работе", "Выполнена"]] = Field(default="Назначена")
     start: Optional[datetime] = Field(default=None)
     end: Optional[datetime] = Field(default=None)
     performer_id: Optional[int] = Field(default=None)
@@ -47,7 +47,7 @@ class TaskUpdate(CustomBase):
     description: Optional[str] = Field(default=None)
     color: Optional[str] = Field(default=None)
     priority: Optional[Literal["Низкий", "Средний", "Высокий", "Критический"]] = Field(default=None)
-    status: Optional[Literal["Назначена", "В работе", "Выполенена"]] = Field(default=None)
+    status: Optional[Literal["Назначена", "В работе", "Выполнена"]] = Field(default=None)
     tags: Optional[list[int]] = Field(default=None)
     
     performer_id: Optional[int] = Field(default=None, description="ID исполнителя. Если передать 0, исполнитель будет сброшен")

@@ -9,7 +9,6 @@ MESSAGE_FIELD = Field(max_length=100)
 
 class NotificationCreate(CustomBase):
     message: str = MESSAGE_FIELD
-    user_id: int
     link: Optional[str] = None
 
 class ProjectNotificationCreate(CustomBase):
