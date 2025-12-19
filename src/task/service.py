@@ -8,6 +8,7 @@ from src.user_project_association.repository import UserProjectAssociationReposi
 from src.tag.repository import TagRepository
 from src.project.repository import ProjectRepository
 from .repository import TaskRepository
+from websocket.manager import ws_manager
 
 class TaskService:
     def __init__(self, session: AsyncSession):
@@ -54,6 +55,7 @@ class TaskService:
             performer = await UserProjectAssociationRepository(self.session).get_membership(task_create.performer_id, project_id)
             if performer is None:
                 raise BadRequestException("Исполнитель не является участником проекта")
+            ws_manager.send_personal_message(performer.user_id, {"msg": "На тебя назначена задача!"})
         if task_create.start and task_create.end:
             if task_create.start > task_create.end:
                 raise BadRequestException("Дата начала не может быть позже даты окончания")
