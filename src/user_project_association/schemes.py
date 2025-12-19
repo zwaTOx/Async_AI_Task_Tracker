@@ -3,6 +3,8 @@ from typing import Optional
 from src.schemas import CustomBase
 from pydantic import Field
 from fastapi import Query
+
+from src.user.schemes import UserResponse
 from .utils import Roles, Inv_Roles, Update_Roles
 from src.config import settings
 
@@ -17,7 +19,7 @@ class InviteProjectData(CustomBase):
 
 class MembershipResponse(CustomBase):
     id: int
-    user_id: int
+    user: UserResponse
     category_id: Optional[int] = Field(default=None)
     project_id: int
     role: Roles

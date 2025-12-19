@@ -1,6 +1,6 @@
 from sqlalchemy import DateTime, ForeignKey, func, Enum
 from datetime import datetime
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.database import Base, int_pk
 from .utils import Roles
 
@@ -14,4 +14,6 @@ class UserProjectAssociation(Base):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
+
+    user = relationship('User', foreign_keys=[user_id], backref="user_project_associations")
 

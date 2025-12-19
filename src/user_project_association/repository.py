@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import joinedload
 from sqlmodel import select
 from .models import UserProjectAssociation
 from .schemes import InviteProjectData, UpdateMemberData, MembershipResponse
@@ -10,7 +11,10 @@ class UserProjectAssociationRepository:
         self.session = session
 
     async def get_project_memberships(self, project_id: int):
-        statement = select(UserProjectAssociation).filter(UserProjectAssociation.project_id==project_id)
+        statement = select(UserProjectAssociation).filter(UserProjectAssociation.project_id==project_id)\
+            .options(
+                joinedload(UserProjectAssociation.user)
+            )
         result = await self.session.exec(statement)
         return result.all()
 
