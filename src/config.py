@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     UPLOAD_DIRECTORY: str
     MAX_FILE_SIZE_MB: int = 50*1024*1024
     ALLOWED_ICON_TYPES: list[str] = ["image/jpeg", "image/png"]
+    ALLOWED_FILE_TYPES: list[str] = ["image/jpeg", "image/png", "application/pdf", "text/csv", 
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel"]
 
     USER_JWT_EXP_MIN: int
     USER_JWT_ALG: str

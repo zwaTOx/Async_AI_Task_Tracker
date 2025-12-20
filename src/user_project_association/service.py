@@ -9,7 +9,7 @@ from src.user.repository import UserRepository
 from src.code.utils import create_invite_project_token, decode_invite_project_token
 from src.email.invite import send_project_invite
 from src.category.repository import CategoryRepository
-from .schemes import InviteModel, UpdateMemberData, MembershipResponse
+from .schemes import InviteModel, MembershipWithUserResponse, UpdateMemberData, MembershipResponse
 from .repository import UserProjectAssociationRepository
 from src.config import settings
 
@@ -29,7 +29,7 @@ class ProjectAssociationService:
     async def get_project_members(self, 
         user_id: int, 
         project_id: int
-    ) -> MembershipResponse:
+    ) -> MembershipWithUserResponse:
         memberships = await UserProjectAssociationRepository(self.session).get_project_memberships(project_id)
         return memberships
     

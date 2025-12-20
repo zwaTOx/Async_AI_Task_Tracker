@@ -5,21 +5,36 @@ from src.user.dependencies import CurrentUser
 from src.user_project_association.dependencies import verify_project_member
 from src.database import DbSession
 from .service import AttachmentService
+from .schemes import AttachResponse
 
 attach_router = APIRouter()
 
 @attach_router.post(
     "/icons",
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    response_model=AttachResponse
 )
-async def upload_attachment(
+async def upload_icon(
+    session: DbSession,
+    user: CurrentUser,
+    attachment: UploadFile = File(...)
+):
+    new_attach = await AttachmentService(session).upload_icon(attachment, user.id)
+    return new_attach
+    
+@attach_router.post(
+    "/file",
+    status_code=status.HTTP_201_CREATED,
+    response_model=AttachResponse
+)
+async def upload_file(
     session: DbSession,
     user: CurrentUser,
     attachment: UploadFile = File(...)
 ):
     new_attach = await AttachmentService(session).upload_file(attachment, user.id)
     return new_attach
-    
+
 @attach_router.get(
     "/users/{user_id}/icon",
 )

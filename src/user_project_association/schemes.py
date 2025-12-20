@@ -19,14 +19,16 @@ class InviteProjectData(CustomBase):
 
 class MembershipResponse(CustomBase):
     id: int
-    user: UserResponse
     category_id: Optional[int] = Field(default=None)
     project_id: int
     role: Roles
     joined_at: datetime
 
+class MembershipWithUserResponse(MembershipResponse):
+    user: UserResponse
+
 class MembershipPagination(CustomBase):
-    items: list[MembershipResponse]
+    items: list[MembershipWithUserResponse]
 
 class UpdateMemberData(CustomBase):
     role: Update_Roles = Field(default=settings.DEFAULT_PROJECT_ROLE)
