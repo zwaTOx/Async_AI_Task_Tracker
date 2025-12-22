@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Literal, Optional
 
 from pydantic import Field
+from src.attachment.schemes import AttachResponse
 from src.schemas import CustomBase, TimeStampSchema
 from src.subtask.schemas import SubtaskResponse
 from src.tag.schemes import TagResponse
@@ -38,6 +39,7 @@ class TaskResponseWithSubtasks(TaskResponse):
     subtasks: list[SubtaskResponse]
     creator: UserTaskResponse
     performer: Optional[UserTaskResponse]
+    attachments: list[AttachResponse]
     
 class TaskPagination(CustomBase):
     items: list[TaskResponse]
@@ -49,5 +51,6 @@ class TaskUpdate(CustomBase):
     priority: Optional[Literal["Низкий", "Средний", "Высокий", "Критический"]] = Field(default=None)
     status: Optional[Literal["Назначена", "В работе", "Выполнена"]] = Field(default=None)
     tags: Optional[list[int]] = Field(default=None)
+    files: Optional[list[int]] = Field(default=None)
     
     performer_id: Optional[int] = Field(default=None, description="ID исполнителя. Если передать 0, исполнитель будет сброшен")

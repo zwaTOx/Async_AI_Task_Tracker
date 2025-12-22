@@ -6,6 +6,7 @@ from datetime import datetime
 from src.models import TimeStampMixin
 from src.tag.model import tag_task
 from src.database import Base, int_pk
+from src.attachment.model import attachment_task
 
 class Task(Base, TimeStampMixin):
     id: Mapped[int_pk]
@@ -26,6 +27,5 @@ class Task(Base, TimeStampMixin):
     subtasks = relationship('Subtask', backref='parent_task', cascade="all, delete-orphan")
     tags = relationship('Tag', secondary=tag_task, back_populates="tasks")
     comments = relationship('Comment', backref='task', cascade="all, delete-orphan")
-    #file_id
-
+    attachments = relationship('Attachment', secondary=attachment_task, back_populates="tasks")
     

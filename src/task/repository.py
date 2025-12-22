@@ -4,6 +4,7 @@ from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import selectinload, joinedload
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from src.attachment.model import Attachment
 from src.repository import SQLAlchemyRepository
 from src.exceptions import PermissionException
 from src.tag.model import Tag
@@ -62,6 +63,7 @@ class TaskRepository(SQLAlchemyRepository):
         statement = select(Task).where(Task.id == task_id)\
             .options(
             selectinload(Task.subtasks),
+            selectinload(Task.attachments),
             selectinload(Task.tags),
             joinedload(Task.creator),        
             joinedload(Task.performer)       
@@ -89,3 +91,17 @@ class TaskRepository(SQLAlchemyRepository):
         await self.session.commit()
         await self.session.refresh(task)
         return task
+    
+    async def pin_file(self, task_id: int, attachment) -> Attachment:
+        statement = select(Task).where(Task.id == task_id).options(
+            selectinload(Task.attachments)
+        )
+        result = await self.session.exec(statement)
+        task = result.scalar_one_or_none()
+        if task.attachments:
+            existing_file_ids = [f.id for f in task.attachments]
+            if attachment.id in existing_file_ids:
+                return False
+        task.attachments.append(attachment)
+        await self.session.commit()
+        return attachment

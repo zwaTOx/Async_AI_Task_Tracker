@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import List, Optional
 from sqlmodel.ext.asyncio.session import AsyncSession
-from src.exceptions import BadRequestException, PermissionException
+from src.exceptions import BadRequestException, NotFoundException, PermissionException
 from src.notification.schemes import NotificationCreate
 from src.user_project_association.access_config import UserRole
 from .schemas import TaskCreate, TaskResponse, TaskResponseWithSubtasks, TaskUpdate
 from src.user_project_association.repository import UserProjectAssociationRepository
+from src.attachment.repository import AttachmentRepository
 from src.tag.repository import TagRepository
 from src.project.repository import ProjectRepository
 from src.notification.service import NotificationService
@@ -99,5 +100,27 @@ class TaskService:
         upd_task = await TaskRepository(self.session).update_task(task_id, task_update)
         return upd_task
         
+    async def pin_file(self, user_id: int, project_id: int, task_id: int, file_id: int):
+        # member = await UserProjectAssociationRepository(self.session).get_membership(user_id, project_id)
+        task = await TaskRepository(self.session).get_task(task_id)
+        if task.performer_id == user_id:
+            raise PermissionException
+        attachment = await AttachmentRepository(self.session).get(file_id)
+        if attachment is None:
+            raise NotFoundException("Файл не найден")
+        result = await TaskRepository(self.session).pin_file(task_id, attachment)
+        if not result:
+            raise BadRequestException("Файл уже прикреплен к задаче")
+        return result
+
+    async def unpin_file(self, user_id: int, project_id: int, task_id: int, file_id: int):
+        task = await TaskRepository(self.session).get_task(task_id)
+        if task.performer_id == user_id:
+            raise PermissionException
+        attachment = await AttachmentRepository(self.session).get_task_file(task_id, file_id)
+        if attachment is None:
+            raise NotFoundException("Файл не найден")
+        await AttachmentRepository(self.session).unpin_file(task_id, attachment.id)
+
     async def delete_task(self, user_id: int, project_id: int, task_id: int):
         await TaskRepository(self.session).delete(task_id)

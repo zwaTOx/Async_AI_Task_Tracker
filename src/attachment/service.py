@@ -70,7 +70,7 @@ class AttachmentService:
             raise NotFoundException("Пользователь не найден")
         attach_id = user.icon_id
         print(attach_id)
-        attachment = await AttachmentRepository(self.session).get_attachment_by_id(attach_id)
+        attachment = await AttachmentRepository(self.session).get(attach_id)
         if attachment is None:
             raise BadRequestException("Такой иконки нет. Дефолтная иконка")
         file_path = os.path.join(settings.UPLOAD_DIRECTORY, attachment.system_filename)
@@ -83,7 +83,7 @@ class AttachmentService:
         if project is None:
             raise NotFoundException("Проект не найден")
         attach_id = project.icon_id
-        attachment = await AttachmentRepository(self.session).get_attachment_by_id(attach_id)
+        attachment = await AttachmentRepository(self.session).get(attach_id)
         if attachment is None:
             raise BadRequestException("Такой иконки нет. Дефолтная иконка")
         file_path = os.path.join(settings.UPLOAD_DIRECTORY, attachment.system_filename)

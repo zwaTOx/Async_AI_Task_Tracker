@@ -9,6 +9,7 @@ from src.user_project_association.access_config import Action, ResourceType
 from src.user.dependencies import CurrentUser
 from .service import TaskService
 from .schemas import TaskCreate, TaskPagination, TaskResponse, TaskResponseWithSubtasks, TaskUpdate
+from src.attachment.schemes import AttachResponse
 from src.websocket.manager import ws_manager
 
 task_router = APIRouter()
@@ -100,6 +101,39 @@ async def update_task(
 ):
     upd_task = await TaskService(session).update_task(user.id, project_id, task_id, task_update)
     return upd_task
+
+@task_router.post(
+    "/{project_id}/tasks/{task_id}/files",
+    response_model=AttachResponse,
+    dependencies=[
+        Depends(verify_task_action(Action.EDIT))
+    ],
+)
+async def pin_file_in_task(
+    session: DbSession,
+    user: CurrentUser,
+    project_id: int,
+    task_id: int,
+    file_id: int
+):
+    file_info = await TaskService(session).pin_file(user.id, project_id, task_id, file_id)
+    return file_info
+
+@task_router.delete(
+    "/{project_id}/tasks/{task_id}/files",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[
+        Depends(verify_task_action(Action.EDIT))
+    ],
+)
+async def unpin_file_in_task(
+    session: DbSession,
+    user: CurrentUser,
+    project_id: int,
+    task_id: int,
+    file_id: int
+):
+    await TaskService(session).unpin_file(user.id, project_id, task_id, file_id)
 
 @task_router.delete(
     "/{project_id}/tasks/{task_id}",

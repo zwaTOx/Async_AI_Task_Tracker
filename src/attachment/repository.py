@@ -1,11 +1,11 @@
+from typing import Optional
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from sqlmodel import select
+from src.repository import SQLAlchemyRepository
+from .model import Attachment, AttachmentType, attachment_task
 
-from .model import Attachment, AttachmentType
-
-class AttachmentRepository:
-    def __init__(self, session: AsyncSession):
-        self.session = session
+class AttachmentRepository(SQLAlchemyRepository):
+    model = Attachment
 
     async def add_file(self, system_filename: str, user_filename: str, user_id: int, attach_type: AttachmentType):
         attach = Attachment(
@@ -18,7 +18,23 @@ class AttachmentRepository:
         await self.session.commit()
         return attach
     
-    async def get_attachment_by_id(self, attach_id: int):
-        statement = select(Attachment).filter(Attachment.id==attach_id)
+    async def get_task_file(self, task_id: int, file_id: int) -> Optional[Attachment]:
+        statement = select(Attachment).join(
+            attachment_task, 
+            Attachment.id == attachment_task.c.attachment_id
+        ).where(
+            (attachment_task.c.task_id == task_id) &
+            (Attachment.id == file_id)
+        )
+        
         result = await self.session.exec(statement)
-        return result.first()
+        return result.scalar_one_or_none()
+    
+    async def   unpin_file(self, task_id: int, file_id: int):
+        statement = delete(attachment_task).where(
+            (attachment_task.c.task_id == task_id) &
+            (attachment_task.c.attachment_id == file_id)
+        )
+        
+        result = await self.session.execute(statement)
+        await self.session.commit()
