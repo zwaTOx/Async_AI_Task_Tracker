@@ -6,11 +6,11 @@ from src.project.schemes import ProjectResponse
 
 class CategoryCreate(CustomBase):
     name: str= Field(max_length=30) 
-    color: str = Field(max_length=10) 
+    color: str = Field() 
 
 class CategoryUpdate(CustomBase):
     name: Optional[str] = Field(default=None, max_length=30) 
-    color: Optional[str] = Field(default=None, max_length=10) 
+    color: Optional[str] = Field(default=None) 
 
 class CategoryResponse(CategoryCreate):
     id: int
