@@ -47,7 +47,7 @@ class UserService:
     
     async def update_user(self, user_id: int, user_update_data: UserUpdateData):
         if user_update_data.icon_id is not None:
-            attach = await AttachmentRepository(self.session).get_attachment_by_id(user_update_data.icon_id)
+            attach = await AttachmentRepository(self.session).get(user_update_data.icon_id)
             if attach is None:
                 raise NotFoundException("Вложение не найдено")
         if user_update_data.username is not None:
