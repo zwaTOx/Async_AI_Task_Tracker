@@ -43,7 +43,7 @@ async def create_tag(
     return new_tag
 
 @tag_router.patch(
-    "{project_id}/tags/{tag_id}",
+    "/{project_id}/tags/{tag_id}",
     dependencies=[
         Depends(verify_tag_action(Action.EDIT))
     ], 
@@ -59,7 +59,7 @@ async def update_tag(
     return tag_upd
 
 @tag_router.delete(
-    "{project_id}/tags/{tag_id}",
+    "/{project_id}/tags/{tag_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[
         Depends(verify_tag_action(Action.DELETE))
