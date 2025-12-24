@@ -53,7 +53,7 @@ class AttachmentService:
         content_type = upload_file.content_type
         if content_type not in allowed_types:
             raise BadRequestException(f"Недопустимый формат файл")
-        file_path = os.path.join(settings.UPLOAD_DIRECTORY, upload_file.filename)
+        file_path = os.path.join(settings.UPLOAD_DIRECTORY, system_filename)
         with open(file_path, 'wb') as f:
             f.write(contents)
         new_attach = await AttachmentRepository(self.session).add_file(
@@ -74,6 +74,7 @@ class AttachmentService:
         if attachment is None:
             raise BadRequestException("Такой иконки нет. Дефолтная иконка")
         file_path = os.path.join(settings.UPLOAD_DIRECTORY, attachment.system_filename)
+        print(file_path)
         if not os.path.exists(file_path):
             raise NotFoundException("Вложение не найдено на сервере")
         return file_path
